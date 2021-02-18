@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy the IAMUser for Tanium Threat Response to be able to store evidence in S3 bucket.
+Parameters:
+  UserName:
+    Type: String
+    Description: A name for the IAM user.
+  CustomPolicySuffix:
+    Type: String
+    Description: Suffix name of custom policy.
+  PolicyName:
+    Type: String
+    Description: A policy name from the pre defined list.
+Resources:
+  IAMUser:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: IAMUser
+      ProvisioningArtifactName: 2.4.2
+      ProvisionedProductName: threat-response-iam-user
+      ProvisioningParameters:
+        - Key: UserName
+          Value: !Ref UserName
+        - Key: PolicyName
+          Value: !Ref PolicyName
+        - Key: CustomPolicySuffix
+          Value: !Ref CustomPolicySuffix
+      Tags:
+        - Key: doNotShutDown
+          Value: true
+Outputs:
+  StackArn:
+    Value: !GetAtt IAMUser.CloudformationStackArn
+    Description: The ARN of the created cloud formation stack
