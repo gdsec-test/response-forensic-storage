@@ -26,7 +26,7 @@ Resources:
                    "s3:PutObject"
                    ],
                  "Effect": "Allow",
-                 "Resource": "arn:aws:s3:::gd-response-dev-private-forensic-storage/*"
+                 "Resource": "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
                 }
               ]
             }
