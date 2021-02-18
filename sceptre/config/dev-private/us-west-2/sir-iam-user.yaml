@@ -1,0 +1,7 @@
+template_path: sir-iam-user.yaml
+dependencies:
+  - {{environment}}/{{region}}/sir-iam-policy.yaml
+parameters:
+  UserName: "GD-user-sir"
+  PolicyName: "CustomPolicy"
+  CustomPolicySuffix: "sir-iam-policy"
