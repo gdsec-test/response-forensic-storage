@@ -6,9 +6,6 @@ Parameters:
     Type: String
     Description: Name of custom Policy appended to TeamName-custom-
     Default: "SamplePolicyName"
-  StorageBucketName:
-    Type: String
-    Description: Name of the Bucket used for Storage
 
 Resources:
   IAMPolicy:
