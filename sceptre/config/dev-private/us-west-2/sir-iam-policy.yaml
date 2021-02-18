@@ -3,4 +3,3 @@ dependencies:
   - {{environment}}/{{region}}/s3.yaml
 parameters:
   PolicyNameSuffix: "sir-iam-policy"
-  StorageBucketName: gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage
