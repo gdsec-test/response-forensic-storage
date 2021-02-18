@@ -1,0 +1,532 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Bucket where SIR will create folders for incident evidence
+Parameters:
+  BucketNameSuffix:
+    Type: String
+    MinLength: 1
+    AllowedPattern: "[a-z][a-z0-9-]+[a-z0-9]"
+    Description: Unique naming suffix for bucket
+  BucketPolicy:
+    Type: String
+    Description: Bucket ACL to set
+    Default: Private
+    AllowedValues:
+      - Private
+      - LogDeliveryWrite
+      - AwsExecRead
+      - BucketOwnerRead
+      - BucketOwnerFullControl
+      - PublicRead
+      - AuthenticatedRead
+  ReadOnlyRoles:
+    Type: CommaDelimitedList
+    Description: (Optional) List of IAM roles that will have read-only access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
+    Default: ""
+  ReadWriteRoles:
+    Type: CommaDelimitedList
+    Description: (Optional) List of IAM roles that will have read-write access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
+    Default: ""
+  ReadWriteDeleteRoles:
+    Type: CommaDelimitedList
+    Description: (Optional) List of IAM roles that will have read-write-delete access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
+    Default: ""
+  CustomBucketPolicyJSON:
+    Type: String
+    Description: Custom JSON S3 Bucket Policy
+    Default: ""
+  VersioningStatus:
+    Type: String
+    Description: Versioning should be enabled unless there is good reason not to.
+    Default: Enabled
+    AllowedValues:
+      - Enabled
+      - Suspended
+      - Disabled
+  MoveToStandardIAStorageDays:
+    Type: Number
+    Description: (Optional) Days before moving objects to standard Infrequent Access storage. Set to -1 to never move. Defaults to never moving. Ignored if `CustomS3Bucket` is specified.
+    Default: -1
+  MoveToGlacierStorageDays:
+    Type: Number
+    Description: (Optional) Days before moving objects to Glacier. Set to -1 to never move. Defaults to never moving. Ignored if `CustomS3Bucket` is specified.
+    Default: -1
+    AllowedValues:
+      - -1
+      - 90
+      - 180
+      - 365
+      - 730
+      - 1096
+      - 1460
+      - 2557
+  ExpirationDays:
+    Type: Number
+    Description: (optional) Days before expiring object. Set to -1 to never expire.
+    Default: -1
+    AllowedValues:
+      - -1
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+      - 180
+      - 365
+      - 1096
+      - 1460
+      - 2557
+  CurrentVersionTransitions:
+    Type: String
+    Description: Transitions For Current Versions of S3 Objects
+    Default: "{}"
+  CustomLifecycleRules:
+    Type: String
+    Description: Custom lifecycle rules.
+    Default: "[]"
+  OldVersionExpirationDays:
+    Type: Number
+    Description: (optional) Days before expiring outdated object versions. Set to -1 to never expire.
+    Default: 180
+    AllowedValues:
+      - -1
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+      - 180
+      - 365
+      - 1096
+      - 1460
+      - 2557
+  OldVersionTransitions:
+    Type: String
+    Description: Transitions For Older Versions of S3 Objects. Should be a JSON escaped String
+    Default: "[{\"StorageClass\":\"STANDARD_IA\",\"TransitionInDays\":30}]"
+  CorsRules:
+    Type: String
+    Description: Cors Rules for the bucket so you can enable cors (useful for cloudfront fronting of certain assets).
+    Default: ""
+  ReplicationBucketName:
+    Type: String
+    Description: (optional) The name of the replication bucket. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
+    Default: ""
+    MaxLength: 63
+  PrefixForReplication:
+    Type: String
+    Description: (optional) An object prefix. This rule applies to all Amazon S3 objects with this prefix. To specify all objects in an S3 bucket, specify an empty string.
+    Default: ""
+  DestinationAccountId:
+    Type: String
+    Description: (optional) The destination account id of the replica bucket. Replicate only to different environments.
+    Default: ""
+  NotificationConfigurationJson:
+    Type: String
+    Description: (optional) JSON definition of S3 Notification Configuration https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfig.html
+    Default: ""
+  LambdaS3Bucket:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM parameter referencing the S3 Bucket which contains the Lambda code
+    Default: /AdminParams/Team/GlobalBucket
+    AllowedValues:
+      - /AdminParams/Team/GlobalBucket
+  DevelopmentTeam:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for team owning the created resources.
+    Default: /AdminParams/Team/Name
+    AllowedValues:
+      - /AdminParams/Team/Name
+  DevelopmentEnvironment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for development environment this will live in.
+    Default: /AdminParams/Team/Environment
+    AllowedValues:
+      - /AdminParams/Team/Environment
+  OrgType:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Business Unit of the Account.
+    Default: /AdminParams/Team/OrgType
+    AllowedValues:
+      - /AdminParams/Team/OrgType
+  EnvMode:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for development mode of the account.
+    Default: /AdminParams/Team/EnvMode
+    AllowedValues:
+      - /AdminParams/Team/EnvMode
+  AccessLogsBucket:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Access logs S3 bucket.
+    Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+    AllowedValues:
+      - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+  EnableBucketMetrics:
+    Type: String
+    Description: Enable all available bucket metrics.
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  InventoryConfigurationsJson:
+    Type: String
+    Description: JSON definition of the inventory configuration for an Amazon S3 bucket. For more information, see https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETInventoryConfig.html (optional)
+    Default: ""
+  EnableStaticHosting:
+    Type: String
+    Description: (optional) Enable Amazon S3 bucket be served as a static website.
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  IndexDocument:
+    Type: String
+    Description: (optional) The default document for static website hosting when no specific document is requested.
+    Default: ""
+  ErrorDocument:
+    Type: String
+    Description: (optional) The document that is served when a requested document is not found.
+    Default: ""
+  RoutingRules:
+    Type: String
+    Description: "(optional) JSON defining rules that define when a redirect is applied and the redirect behavior. See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-websiteconfiguration.html"
+    Default: ""
+Mappings:
+  Organizations:
+    non-pci:
+      prod: o-nkgi7akmvi
+      dev: o-by05f6zmn4
+    pci:
+      prod: o-1xnd0t0rwa
+    hackathon:
+      prod: o-5tjjsp4k13
+    registry:
+      prod: o-pn5n9kd1l3
+Conditions:
+  UsingCorsRules: !Not [ !Equals [ !Ref CorsRules, "" ] ]
+  UsingExpiration: !Not [ !Equals [ !Ref ExpirationDays, -1 ] ]
+  UsingOldVersionExpiration: !Not [ !Equals [ !Ref OldVersionExpirationDays, -1 ] ]
+  UsingCurrentVersionTransitions: !Not [ !Equals [ !Ref CurrentVersionTransitions, "{}" ] ]
+  UsingOldVersionTransitions: !Not [ !Equals [ !Ref OldVersionTransitions, "{}" ] ]
+  UsingIAStorage: !Not [ !Equals [ !Ref MoveToStandardIAStorageDays, -1 ] ]
+  UsingGlacier: !Not [ !Equals [ !Ref MoveToGlacierStorageDays, -1 ] ]
+  HasLifecycleTransitions: !Or
+    - !Condition UsingIAStorage
+    - !Condition UsingGlacier
+  UsingCustomLifecycleRules: !Not [ !Equals [ !Ref CustomLifecycleRules, "[]" ] ]
+  NeedReplication: !Not [ !Equals [ !Ref ReplicationBucketName, "" ] ]
+  NeedReplicationInDifferentAccount: !Not [ !Equals [ !Ref DestinationAccountId, "" ] ]
+  UsingNotifications: !Not [ !Equals [ !Ref NotificationConfigurationJson, "" ] ]
+  IsPCI: !Equals [ !Ref OrgType, pci ]
+  UseJSONCustomPolicy: !Not [ !Equals [ !Ref CustomBucketPolicyJSON, "" ] ]
+  UseReadOnlyRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadOnlyRoles ], "" ] ]
+  UseReadWriteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteRoles ], "" ] ]
+  UseReadWriteDeleteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteDeleteRoles ], "" ] ]
+  NeedsCustomBucketPolicy: !Or
+    - !Condition UseJSONCustomPolicy
+    - !Condition UseReadOnlyRoles
+    - !Condition UseReadWriteRoles
+    - !Condition UseReadWriteDeleteRoles
+  IsPublic: !And
+    - !Not [ !Condition IsPCI ]
+    - !Or
+      - !Equals [ !Ref BucketPolicy, AuthenticatedRead ]
+      - !Equals [ !Ref BucketPolicy, PublicRead ]
+  EnableMetrics: !Equals [ !Ref EnableBucketMetrics, true ]
+  NeedInventoryConfigurations: !Not [ !Equals [ !Ref InventoryConfigurationsJson, "" ] ]
+  EnableWebsiteConfiguration: !Equals [!Ref EnableStaticHosting, true]
+  HasIndexDocument: !Not [ !Equals [ !Ref IndexDocument, "" ] ]
+  HasErrorDocument: !Not [ !Equals [ !Ref ErrorDocument, "" ] ]
+  HasRoutingRules: !Not [ !Equals [ !Ref RoutingRules, ""]]
+  EnableVersioning: !Not [ !Equals [ !Ref VersioningStatus, "Disabled"] ]
+Resources:
+  BucketReplicationRole:
+    Type: AWS::IAM::Role
+    Condition: NeedReplication
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: sts:AssumeRole
+  BucketReplicationPolicy:
+    Type: AWS::IAM::Policy
+    Condition: NeedReplication
+    Properties:
+      PolicyName: BucketReplicationPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetReplicationConfiguration
+              - s3:ListBucket
+            Resource: !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
+          - Effect: Allow
+            Action:
+              - s3:GetObjectVersion
+              - s3:GetObjectVersionAcl
+              - s3:GetObjectVersionTagging
+            Resource: !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*
+          - Effect: Allow
+            Action:
+              - s3:ReplicateObject
+              - s3:ReplicateDelete
+              - s3:ReplicateTags
+            Resource:
+              - !Sub arn:aws:s3:::${ReplicationBucketName}/*
+      Roles:
+        - !Ref BucketReplicationRole
+    DependsOn:
+      - BucketReplicationRole
+  ConvertToJson:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.convert_to_json
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/GD-APPSVCS-LambdaExecutionRole
+      Code:
+        S3Bucket: !Ref LambdaS3Bucket
+        S3Key: conversion/string-to-json-1.0.2.zip
+      Runtime: python3.6
+      Timeout: 30
+      TracingConfig:
+        Mode: Active
+  ConvertNotificationConfiguration:
+    Type: Custom::ConvertNotificationConfiguration
+    Condition: UsingNotifications
+    Properties:
+      ServiceToken: !GetAtt ConvertToJson.Arn
+      Input: !Ref NotificationConfigurationJson
+    DependsOn:
+      - ConvertToJson
+  ConvertCurrentVersionTransitions:
+    Type: Custom::ConvertCurrentVersionTransitions
+    Condition: UsingCurrentVersionTransitions
+    Properties:
+      ServiceToken: !GetAtt ConvertToJson.Arn
+      Input: !Ref CurrentVersionTransitions
+    DependsOn:
+      - ConvertToJson
+  ConvertOldVersionTransitions:
+    Type: Custom::ConvertOldVersionTransitions
+    Condition: UsingOldVersionTransitions
+    Properties:
+      ServiceToken: !GetAtt ConvertToJson.Arn
+      Input: !Ref OldVersionTransitions
+    DependsOn:
+      - ConvertToJson
+  ConvertCustomLifecycleRules:
+    Type: Custom::ConvertCustomLifecycleRules
+    Condition: UsingCustomLifecycleRules
+    Properties:
+      ServiceToken: !GetAtt ConvertToJson.Arn
+      Input: !Ref CustomLifecycleRules
+    DependsOn:
+      - ConvertToJson
+  ConvertCorsRules:
+    Type: Custom::ConvertCorsRules
+    Condition: UsingCorsRules
+    Properties:
+      ServiceToken: !GetAtt ConvertToJson.Arn
+      Input: !Ref CorsRules
+    DependsOn:
+      - ConvertToJson
+  ConvertInventoryConfigurations:
+    Type: Custom::ConvertInventoryConfigurations
+    Condition: NeedInventoryConfigurations
+    Properties:
+      ServiceToken: !GetAtt ConvertToJson.Arn
+      Input: !Ref InventoryConfigurationsJson
+    DependsOn:
+      - ConvertToJson
+  ConvertRoutingRules:
+      Type: Custom::ConvertRoutingRules
+      Condition: HasRoutingRules
+      Properties:
+        ServiceToken: !GetAtt ConvertToJson.Arn
+        Input: !Ref RoutingRules
+      DependsOn:
+        - ConvertToJson
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: !Ref BucketPolicy
+      PublicAccessBlockConfiguration: !If
+        - IsPublic
+        - !Ref "AWS::NoValue"
+        - BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+      BucketName: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules: !If
+          - UsingCorsRules
+          - !GetAtt ConvertCorsRules.JsonValue
+          -
+            - AllowedMethods:
+              - GET
+              AllowedOrigins:
+              - !Sub 'https://gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}.s3.${AWS::Region}.amazonaws.com'
+      LifecycleConfiguration: !If
+        - UsingCustomLifecycleRules
+        - Rules: !GetAtt ConvertCustomLifecycleRules.JsonValue
+        - Rules:
+            - !If
+              - UsingExpiration
+              - ExpirationInDays: !Ref ExpirationDays
+                Status: Enabled
+              - !Ref "AWS::NoValue"
+            - !If
+              - UsingOldVersionExpiration
+              - NoncurrentVersionExpirationInDays: !Ref OldVersionExpirationDays
+                Status: Enabled
+              - !Ref "AWS::NoValue"
+            - !If
+              - UsingCurrentVersionTransitions
+              - Transitions: !GetAtt ConvertCurrentVersionTransitions.JsonValue
+                Status: Enabled
+              - !If
+                - HasLifecycleTransitions
+                - Transitions:
+                    - !If
+                      - UsingIAStorage
+                      - StorageClass: STANDARD_IA
+                        TransitionInDays: !Ref MoveToStandardIAStorageDays
+                      - !Ref "AWS::NoValue"
+                    - !If
+                      - UsingGlacier
+                      - StorageClass: GLACIER
+                        TransitionInDays: !Ref MoveToGlacierStorageDays
+                      - !Ref "AWS::NoValue"
+                  Status: Enabled
+                - !Ref "AWS::NoValue"
+            - !If
+              - UsingOldVersionTransitions
+              - NoncurrentVersionTransitions: !GetAtt ConvertOldVersionTransitions.JsonValue
+                Status: Enabled
+              - !Ref "AWS::NoValue"
+      LoggingConfiguration:
+        DestinationBucketName: !Ref AccessLogsBucket
+        LogFilePrefix: !Sub s3/gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
+      VersioningConfiguration: !If
+        - EnableVersioning
+        - Status: !Ref VersioningStatus
+        - !Ref AWS::NoValue
+      NotificationConfiguration: !If [ UsingNotifications, !GetAtt ConvertNotificationConfiguration.JsonValue, !Ref "AWS::NoValue" ]
+      MetricsConfigurations:
+        - !If
+          - EnableMetrics
+          - Id: EntireBucket
+          - !Ref "AWS::NoValue"
+      Tags:
+        - Key: Name
+          Value: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
+        - Key: ResourceType
+          Value: S3
+      ReplicationConfiguration:
+        !If
+          - NeedReplication
+          - Role: !GetAtt BucketReplicationRole.Arn
+            Rules:
+              - Destination:
+                  Bucket: !Sub arn:aws:s3:::${ReplicationBucketName}
+                  AccessControlTranslation:
+                    !If
+                      - NeedReplicationInDifferentAccount
+                      - Owner:  Destination
+                      - !Ref "AWS::NoValue"
+                  Account:  !If [ NeedReplicationInDifferentAccount, !Ref DestinationAccountId, !Ref "AWS::NoValue" ]
+                Prefix: !Ref PrefixForReplication
+                Status: Enabled
+          - !Ref "AWS::NoValue"
+      InventoryConfigurations:
+        !If
+          - NeedInventoryConfigurations
+          - !GetAtt ConvertInventoryConfigurations.JsonValue
+          - !Ref "AWS::NoValue"
+      WebsiteConfiguration:
+        !If
+          - EnableWebsiteConfiguration
+          - IndexDocument: !If [HasIndexDocument, !Ref IndexDocument, !Ref "AWS::NoValue"]
+            ErrorDocument: !If [HasErrorDocument, !Ref ErrorDocument, !Ref "AWS::NoValue"]
+            RoutingRules: !If [HasRoutingRules, !GetAtt ConvertRoutingRules.JsonValue, !Ref "AWS::NoValue"]
+          - !Ref "AWS::NoValue"
+  CustomBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: NeedsCustomBucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument: !If
+        - UseJSONCustomPolicy
+        - !Ref CustomBucketPolicyJSON
+        - Version: 2012-10-17
+          Statement:
+            - !If
+              - UseReadOnlyRoles
+              - Effect: Allow
+                Action:
+                  - s3:Get*
+                  - s3:List*
+                Resource:
+                  - !GetAtt S3Bucket.Arn
+                  - !Sub ${S3Bucket.Arn}/*
+                Principal:
+                  AWS: "*"
+                Condition:
+                  ArnEquals:
+                    aws:PrincipalArn: !Ref ReadOnlyRoles
+                  StringEquals:
+                    aws:PrincipalOrgID: !FindInMap [ Organizations, !Ref OrgType, !Ref EnvMode ]
+              - !Ref AWS::NoValue
+            - !If
+              - UseReadWriteRoles
+              - Effect: Allow
+                Action:
+                  - s3:Get*
+                  - s3:List*
+                  - s3:PutObject*
+                  - s3:AbortMultipartUpload
+                Resource:
+                  - !GetAtt S3Bucket.Arn
+                  - !Sub ${S3Bucket.Arn}/*
+                Principal:
+                  AWS: "*"
+                Condition:
+                  ArnEquals:
+                    aws:PrincipalArn: !Ref ReadWriteRoles
+                  StringEquals:
+                    aws:PrincipalOrgID: !FindInMap [ Organizations, !Ref OrgType, !Ref EnvMode ]
+              - !Ref AWS::NoValue
+            - !If
+              - UseReadWriteDeleteRoles
+              - Effect: Allow
+                Action:
+                  - s3:Get*
+                  - s3:List*
+                  - s3:PutObject*
+                  - s3:AbortMultipartUpload
+                  - s3:DeleteObject*
+                Resource:
+                  - !GetAtt S3Bucket.Arn
+                  - !Sub ${S3Bucket.Arn}/*
+                Principal:
+                  AWS: "*"
+                Condition:
+                  ArnEquals:
+                    aws:PrincipalArn: !Ref ReadWriteDeleteRoles
+                  StringEquals:
+                    aws:PrincipalOrgID: !FindInMap [ Organizations, !Ref OrgType, !Ref EnvMode ]
+              - !Ref AWS::NoValue
+    DependsOn:
+      - S3Bucket
+Outputs:
+  BucketName:
+    Description: Name of created S3 Bucket
+    Value: !Ref S3Bucket
