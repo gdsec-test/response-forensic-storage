@@ -1,0 +1,6 @@
+template_path: sir-iam-policy.yaml
+dependencies:
+  - forensic-storage/s3.yaml
+parameters:
+  PolicyNameSuffix: "sir-iam-policy"
+  StorageBucketName: gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
