@@ -243,7 +243,6 @@ Resources:
     Type: AWS::IAM::Role
     Condition: NeedReplication
     Properties:
-      ProvisioningArtifactName: 1.9.1
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
