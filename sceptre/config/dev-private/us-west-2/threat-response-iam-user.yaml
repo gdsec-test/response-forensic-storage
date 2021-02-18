@@ -2,6 +2,6 @@ template_path: threat-response-iam-user.yaml
 dependencies:
   - {{environment}}/{{region}}/threat-response-iam-policy.yaml
 parameters:
-  UserName: "tanium-threat-response"
+  UserName: "GD-user-tanium-threat-response"
   PolicyName: "CustomPolicy"
   CustomPolicySuffix: "threat-response-iam-policy"
