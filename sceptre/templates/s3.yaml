@@ -130,9 +130,6 @@ Resources:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
       ProvisionedProductName: response-storage-bucket
-      LoggingConfiguration:
-        DestinationBucketName: !Ref AccessLogsBucket
-        LogFilePrefix: !Sub s3/gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix
@@ -142,6 +139,10 @@ Resources:
           Value: !Ref VersioningStatus
         - Key: EnableMetrics
           Value: !Ref EnableBucketMetrics
+        - Key: DestinationBucketName
+          Value: !Ref AccessLogsBucket
+        - Key: LogFilePrefix
+          Value: !Sub s3/gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
       Tags:
         - Key: Name
           Value: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
