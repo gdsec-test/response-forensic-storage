@@ -175,7 +175,6 @@ Resources:
         - EnableVersioning
         - Status: !Ref VersioningStatus
         - !Ref AWS::NoValue
-      NotificationConfiguration: !If [ UsingNotifications, !GetAtt ConvertNotificationConfiguration.JsonValue, !Ref "AWS::NoValue" ]
       MetricsConfigurations:
         - !If
           - EnableMetrics
