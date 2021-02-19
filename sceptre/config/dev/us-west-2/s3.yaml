@@ -3,6 +3,6 @@ parameters:
   ServiceCatalogVersion: 1.10.0
   BucketPolicy: Private
   VersioningStatus: "Enabled"
-  ExpirationDays: "1460"
-  OldVersionExpirationDays: "1460"
+  ExpirationDays: "2557"
+  OldVersionExpirationDays: "2557"
   EnableBucketMetrics: "true"
