@@ -39,7 +39,6 @@ Parameters:
       - 180
       - 365
       - 1096
-      - 1460
       - 2557
   OldVersionExpirationDays:
     Type: Number
@@ -55,7 +54,6 @@ Parameters:
       - 180
       - 365
       - 1096
-      - 1460
       - 2557
   EnableBucketMetrics:
     Type: String
