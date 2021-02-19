@@ -30,10 +30,6 @@ Parameters:
     Type: CommaDelimitedList
     Description: (Optional) List of IAM roles that will have read-write-delete access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
     Default: ""
-  CustomBucketPolicyJSON:
-    Type: String
-    Description: Custom JSON S3 Bucket Policy
-    Default: ""
   VersioningStatus:
     Type: String
     Description: Versioning should be enabled unless there is good reason not to.
@@ -42,23 +38,6 @@ Parameters:
       - Enabled
       - Suspended
       - Disabled
-  MoveToStandardIAStorageDays:
-    Type: Number
-    Description: (Optional) Days before moving objects to standard Infrequent Access storage. Set to -1 to never move. Defaults to never moving. Ignored if `CustomS3Bucket` is specified.
-    Default: -1
-  MoveToGlacierStorageDays:
-    Type: Number
-    Description: (Optional) Days before moving objects to Glacier. Set to -1 to never move. Defaults to never moving. Ignored if `CustomS3Bucket` is specified.
-    Default: -1
-    AllowedValues:
-      - -1
-      - 90
-      - 180
-      - 365
-      - 730
-      - 1096
-      - 1460
-      - 2557
   ExpirationDays:
     Type: Number
     Description: (optional) Days before expiring object. Set to -1 to never expire.
@@ -75,14 +54,6 @@ Parameters:
       - 1096
       - 1460
       - 2557
-  CurrentVersionTransitions:
-    Type: String
-    Description: Transitions For Current Versions of S3 Objects
-    Default: "{}"
-  CustomLifecycleRules:
-    Type: String
-    Description: Custom lifecycle rules.
-    Default: "[]"
   OldVersionExpirationDays:
     Type: Number
     Description: (optional) Days before expiring outdated object versions. Set to -1 to never expire.
@@ -99,14 +70,6 @@ Parameters:
       - 1096
       - 1460
       - 2557
-  OldVersionTransitions:
-    Type: String
-    Description: Transitions For Older Versions of S3 Objects. Should be a JSON escaped String
-    Default: "[{\"StorageClass\":\"STANDARD_IA\",\"TransitionInDays\":30}]"
-  CorsRules:
-    Type: String
-    Description: Cors Rules for the bucket so you can enable cors (useful for cloudfront fronting of certain assets).
-    Default: ""
   ReplicationBucketName:
     Type: String
     Description: (optional) The name of the replication bucket. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
@@ -120,16 +83,6 @@ Parameters:
     Type: String
     Description: (optional) The destination account id of the replica bucket. Replicate only to different environments.
     Default: ""
-  NotificationConfigurationJson:
-    Type: String
-    Description: (optional) JSON definition of S3 Notification Configuration https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfig.html
-    Default: ""
-  LambdaS3Bucket:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM parameter referencing the S3 Bucket which contains the Lambda code
-    Default: /AdminParams/Team/GlobalBucket
-    AllowedValues:
-      - /AdminParams/Team/GlobalBucket
   DevelopmentTeam:
     Type: AWS::SSM::Parameter::Value<String>
     Description: SSM Parameter for team owning the created resources.
@@ -167,29 +120,6 @@ Parameters:
     AllowedValues:
       - true
       - false
-  InventoryConfigurationsJson:
-    Type: String
-    Description: JSON definition of the inventory configuration for an Amazon S3 bucket. For more information, see https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETInventoryConfig.html (optional)
-    Default: ""
-  EnableStaticHosting:
-    Type: String
-    Description: (optional) Enable Amazon S3 bucket be served as a static website.
-    Default: false
-    AllowedValues:
-      - true
-      - false
-  IndexDocument:
-    Type: String
-    Description: (optional) The default document for static website hosting when no specific document is requested.
-    Default: ""
-  ErrorDocument:
-    Type: String
-    Description: (optional) The document that is served when a requested document is not found.
-    Default: ""
-  RoutingRules:
-    Type: String
-    Description: "(optional) JSON defining rules that define when a redirect is applied and the redirect behavior. See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-websiteconfiguration.html"
-    Default: ""
 Mappings:
   Organizations:
     non-pci:
@@ -239,116 +169,6 @@ Conditions:
   HasRoutingRules: !Not [ !Equals [ !Ref RoutingRules, ""]]
   EnableVersioning: !Not [ !Equals [ !Ref VersioningStatus, "Disabled"] ]
 Resources:
-  BucketReplicationRole:
-    Type: AWS::IAM::Role
-    Condition: NeedReplication
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: s3.amazonaws.com
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action: sts:AssumeRole
-  BucketReplicationPolicy:
-    Type: AWS::IAM::Policy
-    Condition: NeedReplication
-    Properties:
-      PolicyName: BucketReplicationPolicy
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:GetReplicationConfiguration
-              - s3:ListBucket
-            Resource: !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
-          - Effect: Allow
-            Action:
-              - s3:GetObjectVersion
-              - s3:GetObjectVersionAcl
-              - s3:GetObjectVersionTagging
-            Resource: !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*
-          - Effect: Allow
-            Action:
-              - s3:ReplicateObject
-              - s3:ReplicateDelete
-              - s3:ReplicateTags
-            Resource:
-              - !Sub arn:aws:s3:::${ReplicationBucketName}/*
-      Roles:
-        - !Ref BucketReplicationRole
-    DependsOn:
-      - BucketReplicationRole
-  ConvertToJson:
-    Type: AWS::Lambda::Function
-    Properties:
-      Handler: index.convert_to_json
-      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/GD-APPSVCS-LambdaExecutionRole
-      Code:
-        S3Bucket: !Ref LambdaS3Bucket
-        S3Key: conversion/string-to-json-1.0.2.zip
-      Runtime: python3.6
-      Timeout: 30
-      TracingConfig:
-        Mode: Active
-  ConvertNotificationConfiguration:
-    Type: Custom::ConvertNotificationConfiguration
-    Condition: UsingNotifications
-    Properties:
-      ServiceToken: !GetAtt ConvertToJson.Arn
-      Input: !Ref NotificationConfigurationJson
-    DependsOn:
-      - ConvertToJson
-  ConvertCurrentVersionTransitions:
-    Type: Custom::ConvertCurrentVersionTransitions
-    Condition: UsingCurrentVersionTransitions
-    Properties:
-      ServiceToken: !GetAtt ConvertToJson.Arn
-      Input: !Ref CurrentVersionTransitions
-    DependsOn:
-      - ConvertToJson
-  ConvertOldVersionTransitions:
-    Type: Custom::ConvertOldVersionTransitions
-    Condition: UsingOldVersionTransitions
-    Properties:
-      ServiceToken: !GetAtt ConvertToJson.Arn
-      Input: !Ref OldVersionTransitions
-    DependsOn:
-      - ConvertToJson
-  ConvertCustomLifecycleRules:
-    Type: Custom::ConvertCustomLifecycleRules
-    Condition: UsingCustomLifecycleRules
-    Properties:
-      ServiceToken: !GetAtt ConvertToJson.Arn
-      Input: !Ref CustomLifecycleRules
-    DependsOn:
-      - ConvertToJson
-  ConvertCorsRules:
-    Type: Custom::ConvertCorsRules
-    Condition: UsingCorsRules
-    Properties:
-      ServiceToken: !GetAtt ConvertToJson.Arn
-      Input: !Ref CorsRules
-    DependsOn:
-      - ConvertToJson
-  ConvertInventoryConfigurations:
-    Type: Custom::ConvertInventoryConfigurations
-    Condition: NeedInventoryConfigurations
-    Properties:
-      ServiceToken: !GetAtt ConvertToJson.Arn
-      Input: !Ref InventoryConfigurationsJson
-    DependsOn:
-      - ConvertToJson
-  ConvertRoutingRules:
-      Type: Custom::ConvertRoutingRules
-      Condition: HasRoutingRules
-      Properties:
-        ServiceToken: !GetAtt ConvertToJson.Arn
-        Input: !Ref RoutingRules
-      DependsOn:
-        - ConvertToJson
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
