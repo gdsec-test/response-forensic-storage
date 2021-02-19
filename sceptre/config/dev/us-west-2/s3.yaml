@@ -1,7 +1,6 @@
 template_path: s3.yaml
 parameters:
   ServiceCatalogVersion: 1.10.0
-  BucketNameSuffix: "forensic-storage"
   BucketPolicy: Private
   VersioningStatus: "Enabled"
   ExpirationDays: "1460"

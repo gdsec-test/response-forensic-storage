@@ -5,11 +5,6 @@ Parameters:
   ServiceCatalogVersion:
     Type: String
     Description: Service Catalog version for S3
-  BucketNameSuffix:
-    Type: String
-    MinLength: 1
-    AllowedPattern: "[a-z][a-z0-9-]+[a-z0-9]"
-    Description: Unique naming suffix for bucket
   BucketPolicy:
     Type: String
     Description: Bucket ACL to set
@@ -106,6 +101,9 @@ Resources:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
       ProvisionedProductName: response-storage-bucket
+      ProvisioningParameters:
+        - Key: BucketNameSuffix
+          Value: forensic-storage
       Tags:
         - Key: doNotShutDown
           Value: true
