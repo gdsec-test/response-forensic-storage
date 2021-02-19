@@ -134,9 +134,6 @@ Mappings:
 Conditions:
   UsingExpiration: !Not [ !Equals [ !Ref ExpirationDays, -1 ] ]
   UsingOldVersionExpiration: !Not [ !Equals [ !Ref OldVersionExpirationDays, -1 ] ]
-  HasLifecycleTransitions: !Or
-    - !Condition UsingIAStorage
-    - !Condition UsingGlacier
   NeedReplication: !Not [ !Equals [ !Ref ReplicationBucketName, "" ] ]
   NeedReplicationInDifferentAccount: !Not [ !Equals [ !Ref DestinationAccountId, "" ] ]
   IsPCI: !Equals [ !Ref OrgType, pci ]
@@ -144,7 +141,6 @@ Conditions:
   UseReadWriteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteRoles ], "" ] ]
   UseReadWriteDeleteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteDeleteRoles ], "" ] ]
   NeedsCustomBucketPolicy: !Or
-    - !Condition UseJSONCustomPolicy
     - !Condition UseReadOnlyRoles
     - !Condition UseReadWriteRoles
     - !Condition UseReadWriteDeleteRoles
@@ -195,9 +191,7 @@ Resources:
     Condition: NeedsCustomBucketPolicy
     Properties:
       Bucket: !Ref S3Bucket
-      PolicyDocument: !If
-        - UseJSONCustomPolicy
-        - !Ref CustomBucketPolicyJSON
+      PolicyDocument:
         - Version: 2012-10-17
           Statement:
             - !If
