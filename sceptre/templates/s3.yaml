@@ -104,6 +104,12 @@ Resources:
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: forensic-storage
+        - Key: ExpirationDays
+          Value: 1460
+        - Key: OldVersionExpirationDays
+          Value: 1460
+        - Key: EnableBucketMetrics
+          Value: true
       Tags:
         - Key: doNotShutDown
           Value: true
