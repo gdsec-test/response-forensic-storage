@@ -132,22 +132,14 @@ Mappings:
     registry:
       prod: o-pn5n9kd1l3
 Conditions:
-  UsingCorsRules: !Not [ !Equals [ !Ref CorsRules, "" ] ]
   UsingExpiration: !Not [ !Equals [ !Ref ExpirationDays, -1 ] ]
   UsingOldVersionExpiration: !Not [ !Equals [ !Ref OldVersionExpirationDays, -1 ] ]
-  UsingCurrentVersionTransitions: !Not [ !Equals [ !Ref CurrentVersionTransitions, "{}" ] ]
-  UsingOldVersionTransitions: !Not [ !Equals [ !Ref OldVersionTransitions, "{}" ] ]
-  UsingIAStorage: !Not [ !Equals [ !Ref MoveToStandardIAStorageDays, -1 ] ]
-  UsingGlacier: !Not [ !Equals [ !Ref MoveToGlacierStorageDays, -1 ] ]
   HasLifecycleTransitions: !Or
     - !Condition UsingIAStorage
     - !Condition UsingGlacier
-  UsingCustomLifecycleRules: !Not [ !Equals [ !Ref CustomLifecycleRules, "[]" ] ]
   NeedReplication: !Not [ !Equals [ !Ref ReplicationBucketName, "" ] ]
   NeedReplicationInDifferentAccount: !Not [ !Equals [ !Ref DestinationAccountId, "" ] ]
-  UsingNotifications: !Not [ !Equals [ !Ref NotificationConfigurationJson, "" ] ]
   IsPCI: !Equals [ !Ref OrgType, pci ]
-  UseJSONCustomPolicy: !Not [ !Equals [ !Ref CustomBucketPolicyJSON, "" ] ]
   UseReadOnlyRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadOnlyRoles ], "" ] ]
   UseReadWriteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteRoles ], "" ] ]
   UseReadWriteDeleteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteDeleteRoles ], "" ] ]
@@ -162,11 +154,6 @@ Conditions:
       - !Equals [ !Ref BucketPolicy, AuthenticatedRead ]
       - !Equals [ !Ref BucketPolicy, PublicRead ]
   EnableMetrics: !Equals [ !Ref EnableBucketMetrics, true ]
-  NeedInventoryConfigurations: !Not [ !Equals [ !Ref InventoryConfigurationsJson, "" ] ]
-  EnableWebsiteConfiguration: !Equals [!Ref EnableStaticHosting, true]
-  HasIndexDocument: !Not [ !Equals [ !Ref IndexDocument, "" ] ]
-  HasErrorDocument: !Not [ !Equals [ !Ref ErrorDocument, "" ] ]
-  HasRoutingRules: !Not [ !Equals [ !Ref RoutingRules, ""]]
   EnableVersioning: !Not [ !Equals [ !Ref VersioningStatus, "Disabled"] ]
 Resources:
   S3Bucket:
@@ -185,53 +172,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      CorsConfiguration:
-        CorsRules: !If
-          - UsingCorsRules
-          - !GetAtt ConvertCorsRules.JsonValue
-          -
-            - AllowedMethods:
-              - GET
-              AllowedOrigins:
-              - !Sub 'https://gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}.s3.${AWS::Region}.amazonaws.com'
-      LifecycleConfiguration: !If
-        - UsingCustomLifecycleRules
-        - Rules: !GetAtt ConvertCustomLifecycleRules.JsonValue
-        - Rules:
-            - !If
-              - UsingExpiration
-              - ExpirationInDays: !Ref ExpirationDays
-                Status: Enabled
-              - !Ref "AWS::NoValue"
-            - !If
-              - UsingOldVersionExpiration
-              - NoncurrentVersionExpirationInDays: !Ref OldVersionExpirationDays
-                Status: Enabled
-              - !Ref "AWS::NoValue"
-            - !If
-              - UsingCurrentVersionTransitions
-              - Transitions: !GetAtt ConvertCurrentVersionTransitions.JsonValue
-                Status: Enabled
-              - !If
-                - HasLifecycleTransitions
-                - Transitions:
-                    - !If
-                      - UsingIAStorage
-                      - StorageClass: STANDARD_IA
-                        TransitionInDays: !Ref MoveToStandardIAStorageDays
-                      - !Ref "AWS::NoValue"
-                    - !If
-                      - UsingGlacier
-                      - StorageClass: GLACIER
-                        TransitionInDays: !Ref MoveToGlacierStorageDays
-                      - !Ref "AWS::NoValue"
-                  Status: Enabled
-                - !Ref "AWS::NoValue"
-            - !If
-              - UsingOldVersionTransitions
-              - NoncurrentVersionTransitions: !GetAtt ConvertOldVersionTransitions.JsonValue
-                Status: Enabled
-              - !Ref "AWS::NoValue"
       LoggingConfiguration:
         DestinationBucketName: !Ref AccessLogsBucket
         LogFilePrefix: !Sub s3/gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
@@ -250,34 +190,6 @@ Resources:
           Value: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
         - Key: ResourceType
           Value: S3
-      ReplicationConfiguration:
-        !If
-          - NeedReplication
-          - Role: !GetAtt BucketReplicationRole.Arn
-            Rules:
-              - Destination:
-                  Bucket: !Sub arn:aws:s3:::${ReplicationBucketName}
-                  AccessControlTranslation:
-                    !If
-                      - NeedReplicationInDifferentAccount
-                      - Owner:  Destination
-                      - !Ref "AWS::NoValue"
-                  Account:  !If [ NeedReplicationInDifferentAccount, !Ref DestinationAccountId, !Ref "AWS::NoValue" ]
-                Prefix: !Ref PrefixForReplication
-                Status: Enabled
-          - !Ref "AWS::NoValue"
-      InventoryConfigurations:
-        !If
-          - NeedInventoryConfigurations
-          - !GetAtt ConvertInventoryConfigurations.JsonValue
-          - !Ref "AWS::NoValue"
-      WebsiteConfiguration:
-        !If
-          - EnableWebsiteConfiguration
-          - IndexDocument: !If [HasIndexDocument, !Ref IndexDocument, !Ref "AWS::NoValue"]
-            ErrorDocument: !If [HasErrorDocument, !Ref ErrorDocument, !Ref "AWS::NoValue"]
-            RoutingRules: !If [HasRoutingRules, !GetAtt ConvertRoutingRules.JsonValue, !Ref "AWS::NoValue"]
-          - !Ref "AWS::NoValue"
   CustomBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Condition: NeedsCustomBucketPolicy
