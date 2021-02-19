@@ -134,8 +134,6 @@ Mappings:
 Conditions:
   UsingExpiration: !Not [ !Equals [ !Ref ExpirationDays, -1 ] ]
   UsingOldVersionExpiration: !Not [ !Equals [ !Ref OldVersionExpirationDays, -1 ] ]
-  NeedReplication: !Not [ !Equals [ !Ref ReplicationBucketName, "" ] ]
-  NeedReplicationInDifferentAccount: !Not [ !Equals [ !Ref DestinationAccountId, "" ] ]
   IsPCI: !Equals [ !Ref OrgType, pci ]
   UseReadOnlyRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadOnlyRoles ], "" ] ]
   UseReadWriteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteRoles ], "" ] ]
