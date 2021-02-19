@@ -105,9 +105,9 @@ Resources:
         - Key: BucketNameSuffix
           Value: forensic-storage
         - Key: ExpirationDays
-          Value: 1460
+          Value: 2557
         - Key: OldVersionExpirationDays
-          Value: 1460
+          Value: 2557
         - Key: EnableBucketMetrics
           Value: true
       Tags:
