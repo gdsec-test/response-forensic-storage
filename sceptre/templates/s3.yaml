@@ -161,13 +161,6 @@ Resources:
       ProvisionedProductName:
         Fn::Sub: "${BucketNameSuffix}-s3"
       AccessControl: !Ref BucketPolicy
-      PublicAccessBlockConfiguration: !If
-        - IsPublic
-        - !Ref "AWS::NoValue"
-        - BlockPublicAcls: true
-          BlockPublicPolicy: true
-          IgnorePublicAcls: true
-          RestrictPublicBuckets: true
       BucketName: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
