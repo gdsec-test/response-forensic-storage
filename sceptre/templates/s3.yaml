@@ -22,18 +22,6 @@ Parameters:
       - BucketOwnerFullControl
       - PublicRead
       - AuthenticatedRead
-  ReadOnlyRoles:
-    Type: CommaDelimitedList
-    Description: (Optional) List of IAM roles that will have read-only access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
-    Default: ""
-  ReadWriteRoles:
-    Type: CommaDelimitedList
-    Description: (Optional) List of IAM roles that will have read-write access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
-    Default: ""
-  ReadWriteDeleteRoles:
-    Type: CommaDelimitedList
-    Description: (Optional) List of IAM roles that will have read-write-delete access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
-    Default: ""
   VersioningStatus:
     Type: String
     Description: Versioning should be enabled unless there is good reason not to.
@@ -111,18 +99,6 @@ Parameters:
     Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
     AllowedValues:
       - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
-Conditions:
-  UsingExpiration: !Not [ !Equals [ !Ref ExpirationDays, -1 ] ]
-  UsingOldVersionExpiration: !Not [ !Equals [ !Ref OldVersionExpirationDays, -1 ] ]
-  UseReadOnlyRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadOnlyRoles ], "" ] ]
-  UseReadWriteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteRoles ], "" ] ]
-  UseReadWriteDeleteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteDeleteRoles ], "" ] ]
-  NeedsCustomBucketPolicy: !Or
-    - !Condition UseReadOnlyRoles
-    - !Condition UseReadWriteRoles
-    - !Condition UseReadWriteDeleteRoles
-  EnableMetrics: !Equals [ !Ref EnableBucketMetrics, true ]
-  EnableVersioning: !Not [ !Equals [ !Ref VersioningStatus, "Disabled"] ]
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -130,90 +106,6 @@ Resources:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
       ProvisionedProductName: response-storage-bucket
-      ProvisioningParameters:
-        - Key: BucketNameSuffix
-          Value: !Ref BucketNameSuffix
-        - Key: BucketPolicy
-          Value: !Ref BucketPolicy
-        - Key: VersioningConfiguration
-          Value: !Ref VersioningStatus
-        - Key: EnableMetrics
-          Value: !Ref EnableBucketMetrics
-        - Key: DestinationBucketName
-          Value: !Ref AccessLogsBucket
-        - Key: LogFilePrefix
-          Value: !Sub s3/gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
       Tags:
-        - Key: Name
-          Value: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
-        - Key: ResourceType
-          Value: S3
         - Key: doNotShutDown
           Value: true
-
-  CustomBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Condition: NeedsCustomBucketPolicy
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument:
-        - Version: 2012-10-17
-          Statement:
-            - !If
-              - UseReadOnlyRoles
-              - Effect: Allow
-                Action:
-                  - s3:Get*
-                  - s3:List*
-                Resource:
-                  - !GetAtt S3Bucket.Arn
-                  - !Sub ${S3Bucket.Arn}/*
-                Principal:
-                  AWS: "*"
-                Condition:
-                  ArnEquals:
-                    aws:PrincipalArn: !Ref ReadOnlyRoles
-                  StringEquals:
-                    aws:PrincipalOrgID: !FindInMap [ Organizations, !Ref OrgType, !Ref EnvMode ]
-              - !Ref AWS::NoValue
-            - !If
-              - UseReadWriteRoles
-              - Effect: Allow
-                Action:
-                  - s3:Get*
-                  - s3:List*
-                  - s3:PutObject*
-                  - s3:AbortMultipartUpload
-                Resource:
-                  - !GetAtt S3Bucket.Arn
-                  - !Sub ${S3Bucket.Arn}/*
-                Principal:
-                  AWS: "*"
-                Condition:
-                  ArnEquals:
-                    aws:PrincipalArn: !Ref ReadWriteRoles
-                  StringEquals:
-                    aws:PrincipalOrgID: !FindInMap [ Organizations, !Ref OrgType, !Ref EnvMode ]
-              - !Ref AWS::NoValue
-            - !If
-              - UseReadWriteDeleteRoles
-              - Effect: Allow
-                Action:
-                  - s3:Get*
-                  - s3:List*
-                  - s3:PutObject*
-                  - s3:AbortMultipartUpload
-                  - s3:DeleteObject*
-                Resource:
-                  - !GetAtt S3Bucket.Arn
-                  - !Sub ${S3Bucket.Arn}/*
-                Principal:
-                  AWS: "*"
-                Condition:
-                  ArnEquals:
-                    aws:PrincipalArn: !Ref ReadWriteDeleteRoles
-                  StringEquals:
-                    aws:PrincipalOrgID: !FindInMap [ Organizations, !Ref OrgType, !Ref EnvMode ]
-              - !Ref AWS::NoValue
-    DependsOn:
-      - S3Bucket
