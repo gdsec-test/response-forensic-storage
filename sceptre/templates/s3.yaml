@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Bucket where SIR will create folders for incident evidence
+
 Parameters:
   ServiceCatalogVersion:
     Type: String
@@ -73,49 +74,6 @@ Parameters:
       - 1096
       - 1460
       - 2557
-  ReplicationBucketName:
-    Type: String
-    Description: (optional) The name of the replication bucket. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
-    Default: ""
-    MaxLength: 63
-  PrefixForReplication:
-    Type: String
-    Description: (optional) An object prefix. This rule applies to all Amazon S3 objects with this prefix. To specify all objects in an S3 bucket, specify an empty string.
-    Default: ""
-  DestinationAccountId:
-    Type: String
-    Description: (optional) The destination account id of the replica bucket. Replicate only to different environments.
-    Default: ""
-  DevelopmentTeam:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for team owning the created resources.
-    Default: /AdminParams/Team/Name
-    AllowedValues:
-      - /AdminParams/Team/Name
-  DevelopmentEnvironment:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development environment this will live in.
-    Default: /AdminParams/Team/Environment
-    AllowedValues:
-      - /AdminParams/Team/Environment
-  OrgType:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: Business Unit of the Account.
-    Default: /AdminParams/Team/OrgType
-    AllowedValues:
-      - /AdminParams/Team/OrgType
-  EnvMode:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development mode of the account.
-    Default: /AdminParams/Team/EnvMode
-    AllowedValues:
-      - /AdminParams/Team/EnvMode
-  AccessLogsBucket:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: Access logs S3 bucket.
-    Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
-    AllowedValues:
-      - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
   EnableBucketMetrics:
     Type: String
     Description: Enable all available bucket metrics.
@@ -123,21 +81,9 @@ Parameters:
     AllowedValues:
       - true
       - false
-Mappings:
-  Organizations:
-    non-pci:
-      prod: o-nkgi7akmvi
-      dev: o-by05f6zmn4
-    pci:
-      prod: o-1xnd0t0rwa
-    hackathon:
-      prod: o-5tjjsp4k13
-    registry:
-      prod: o-pn5n9kd1l3
 Conditions:
   UsingExpiration: !Not [ !Equals [ !Ref ExpirationDays, -1 ] ]
   UsingOldVersionExpiration: !Not [ !Equals [ !Ref OldVersionExpirationDays, -1 ] ]
-  IsPCI: !Equals [ !Ref OrgType, pci ]
   UseReadOnlyRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadOnlyRoles ], "" ] ]
   UseReadWriteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteRoles ], "" ] ]
   UseReadWriteDeleteRoles: !Not [ !Equals [ !Join [ ",", !Ref ReadWriteDeleteRoles ], "" ] ]
@@ -145,11 +91,6 @@ Conditions:
     - !Condition UseReadOnlyRoles
     - !Condition UseReadWriteRoles
     - !Condition UseReadWriteDeleteRoles
-  IsPublic: !And
-    - !Not [ !Condition IsPCI ]
-    - !Or
-      - !Equals [ !Ref BucketPolicy, AuthenticatedRead ]
-      - !Equals [ !Ref BucketPolicy, PublicRead ]
   EnableMetrics: !Equals [ !Ref EnableBucketMetrics, true ]
   EnableVersioning: !Not [ !Equals [ !Ref VersioningStatus, "Disabled"] ]
 Resources:
@@ -158,8 +99,7 @@ Resources:
     Properties:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
-      ProvisionedProductName:
-        Fn::Sub: "${BucketNameSuffix}-s3"
+      ProvisionedProductName: response-storage- bucket
       AccessControl: !Ref BucketPolicy
       BucketName: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
       BucketEncryption:
@@ -183,6 +123,9 @@ Resources:
           Value: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
         - Key: ResourceType
           Value: S3
+          - Key: doNotShutDown
+          Value: true
+
   CustomBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Condition: NeedsCustomBucketPolicy
@@ -249,7 +192,3 @@ Resources:
               - !Ref AWS::NoValue
     DependsOn:
       - S3Bucket
-Outputs:
-  BucketName:
-    Description: Name of created S3 Bucket
-    Value: !Ref S3Bucket
