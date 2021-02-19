@@ -151,8 +151,12 @@ Conditions:
   EnableVersioning: !Not [ !Equals [ !Ref VersioningStatus, "Disabled"] ]
 Resources:
   S3Bucket:
-    Type: AWS::S3::Bucket
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
     Properties:
+      ProductName: S3
+      ProvisioningArtifactName: !Ref ServiceCatalogVersion
+      ProvisionedProductName:
+        Fn::Sub: "${BucketNameSuffix}-s3"
       AccessControl: !Ref BucketPolicy
       PublicAccessBlockConfiguration: !If
         - IsPublic
