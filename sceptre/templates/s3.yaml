@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Bucket where SIR will create folders for incident evidence
 Parameters:
+  ServiceCatalogVersion:
+    Type: String
+    Description: Service Catalog version for S3
   BucketNameSuffix:
     Type: String
     MinLength: 1
