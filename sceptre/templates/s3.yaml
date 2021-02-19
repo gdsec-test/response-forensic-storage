@@ -99,7 +99,7 @@ Resources:
     Properties:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
-      ProvisionedProductName: response-storage- bucket
+      ProvisionedProductName: response-storage-bucket
       AccessControl: !Ref BucketPolicy
       BucketName: !Sub gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
       BucketEncryption:
