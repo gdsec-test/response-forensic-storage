@@ -19,7 +19,7 @@ parameters:
                 "AWS": "arn:aws:iam::149976299053:user/poynt/victor"
             },
             "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::gd-respstorag-dev-forensic-storage/*",
+            "Resource": "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage/*",
             "Condition": {
                 "StringEquals": {
                     "s3:x-amz-acl": "bucket-owner-full-control"
@@ -33,7 +33,7 @@ parameters:
                 "AWS": "arn:aws:iam::149976299053:user/poynt/victor"
             },
             "Action": "s3:ListBucket",
-            "Resource": "arn:aws:s3:::gd-respstorag-dev-forensic-storage"
+            "Resource": "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage"
             }
         ]
     }
