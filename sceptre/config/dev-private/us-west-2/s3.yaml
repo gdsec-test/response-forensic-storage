@@ -5,6 +5,7 @@ parameters:
   ExpirationDays: "2557"
   OldVersionExpirationDays: "2557"
   EnableBucketMetrics: "true"
+  ReadWriteDeleteRoles: ""
   CustomBucketPolicyJSON:  '[
   {
     "Version": "2012-10-17",
