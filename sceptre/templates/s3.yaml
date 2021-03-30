@@ -137,6 +137,13 @@ Resources:
       Tags:
         - Key: doNotShutDown
           Value: true
+  PublicAccessBlockConfiguration: !If
+        - IsPublic
+        - !Ref "AWS::NoValue"
+        - BlockPublicAcls: false
+          BlockPublicPolicy: true
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: true
   CustomBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Condition: NeedsCustomBucketPolicy
