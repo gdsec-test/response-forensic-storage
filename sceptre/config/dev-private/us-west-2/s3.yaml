@@ -16,7 +16,7 @@ parameters:
             "Sid": "Stmt1611277535086",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::222222222222:user/Jane"
+                "AWS": "arn:aws:iam::149976299053:user/poynt/victor"
             },
             "Action": "s3:PutObject",
             "Resource": "arn:aws:s3:::gd-respstorag-dev-forensic-storage/*",
