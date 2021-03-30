@@ -141,16 +141,17 @@ Resources:
           Value: 2557
         - Key: EnableBucketMetrics
           Value: true
-      Tags:
-        - Key: doNotShutDown
-          Value: true
-  PublicAccessBlockConfiguration: !If
+      PublicAccessBlockConfiguration: !If
         - IsPublic
         - !Ref "AWS::NoValue"
         - BlockPublicAcls: false
           BlockPublicPolicy: true
           IgnorePublicAcls: false
           RestrictPublicBuckets: true
+      Tags:
+        - Key: doNotShutDown
+          Value: true
+
   CustomBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Condition: NeedsCustomBucketPolicy
