@@ -4,6 +4,7 @@ parameters:
   VersioningStatus: "Enabled"
   ExpirationDays: "2557"
   OldVersionExpirationDays: "2557"
+  BucketPolicy: "PublicRead"
   EnableBucketMetrics: "true"
   DataLakeBucket: "false"
   CustomBucketPolicyJSON:  '[
