@@ -6,3 +6,32 @@ parameters:
   ExpirationDays: "1460"
   OldVersionExpirationDays: "1460"
   EnableBucketMetrics: "true"
+  CustomBucketPolicyJSON: {
+    "Version": "2012-10-17",
+    "Id": "Policy1611277539797",
+    "Statement": [
+        {
+            "Sid": "Stmt1611277535086",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::222222222222:user/Jane"
+            },
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::destination-DOC-EXAMPLE-BUCKET/*",
+            "Condition": {
+                "StringEquals": {
+                    "s3:x-amz-acl": "bucket-owner-full-control"
+                }
+            }
+        },
+        {
+            "Sid": "Stmt1611277877767",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::222222222222:user/Jane"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::destination-DOC-EXAMPLE-BUCKET"
+        }
+    ]
+}
