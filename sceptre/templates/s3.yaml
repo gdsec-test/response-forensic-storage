@@ -161,6 +161,8 @@ Resources:
         - UseJSONCustomPolicy
         - !Ref CustomBucketPolicyJSON
         - Version: 2012-10-17
+    DependsOn:
+      - S3Bucket
 Outputs:
   BucketName: 
     Description: "Name of created S3 Bucket"
