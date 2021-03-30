@@ -117,7 +117,6 @@ Conditions:
     - !Not [ !Condition DataLakeBucket ]
   NeedsCustomBucketPolicy: !Or
     - !Condition UseJSONCustomPolicy
-    - !Condition UseReadWriteDeleteRoles
     - !Condition DataLakeBucket
 Resources:
   S3Bucket:
