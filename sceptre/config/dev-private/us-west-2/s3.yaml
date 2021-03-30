@@ -6,7 +6,8 @@ parameters:
   ExpirationDays: "1460"
   OldVersionExpirationDays: "1460"
   EnableBucketMetrics: "true"
-  CustomBucketPolicyJSON: {
+  CustomBucketPolicyJSON:  '[
+  {
     "Version": "2012-10-17",
     "Id": "Policy1611277539797",
     "Statement": [
@@ -32,6 +33,7 @@ parameters:
             },
             "Action": "s3:ListBucket",
             "Resource": "arn:aws:s3:::destination-DOC-EXAMPLE-BUCKET"
-        }
-    ]
-}
+            }
+        ]
+    }
+  ]'
