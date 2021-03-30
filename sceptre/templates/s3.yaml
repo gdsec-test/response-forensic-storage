@@ -102,10 +102,6 @@ Conditions:
     - !Not [ !Condition DataLakeBucket ]
   NeedsCustomBucketPolicy: !Or
     - !Condition UseJSONCustomPolicy
-    - !Condition UseReadOnlyRoles
-    - !Condition UseReadWriteRoles
-    - !Condition UseReadWriteDeleteRoles
-    - !Condition DataLakeBucket
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
