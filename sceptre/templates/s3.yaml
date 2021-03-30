@@ -17,6 +17,10 @@ Parameters:
       - BucketOwnerFullControl
       - PublicRead
       - AuthenticatedRead
+  CustomBucketPolicyJSON:
+    Type: String
+    Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
+    Default: ""
   VersioningStatus:
     Type: String
     Description: Versioning should be enabled unless there is good reason not to.
@@ -92,6 +96,16 @@ Parameters:
     Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
     AllowedValues:
       - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+Conditions:
+  UseJSONCustomPolicy: !And
+    - !Not [ !Equals [ !Ref CustomBucketPolicyJSON, "" ] ]
+    - !Not [ !Condition DataLakeBucket ]
+  NeedsCustomBucketPolicy: !Or
+    - !Condition UseJSONCustomPolicy
+    - !Condition UseReadOnlyRoles
+    - !Condition UseReadWriteRoles
+    - !Condition UseReadWriteDeleteRoles
+    - !Condition DataLakeBucket
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -111,6 +125,15 @@ Resources:
       Tags:
         - Key: doNotShutDown
           Value: true
+  CustomBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: NeedsCustomBucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument: !If
+        - UseJSONCustomPolicy
+        - !Ref CustomBucketPolicyJSON
+        - Version: 2012-10-17
 Outputs:
   BucketName: 
     Description: "Name of created S3 Bucket"
