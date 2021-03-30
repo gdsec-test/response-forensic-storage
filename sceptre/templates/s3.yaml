@@ -151,7 +151,6 @@ Resources:
       Tags:
         - Key: doNotShutDown
           Value: true
-
   CustomBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Condition: NeedsCustomBucketPolicy
