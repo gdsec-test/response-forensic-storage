@@ -48,7 +48,7 @@ Resources:
                   ],
                   "Principal": {
                     "AWS": [
-                      "arn:aws:iam::763338924548:user/GD-user-temp"
+                      "arn:aws:iam::539225272086:user/GD-user-temp"
                     ]
                   }
                 },
@@ -62,7 +62,7 @@ Resources:
                   ],
                   "Principal": {
                     "AWS": [
-                      "arn:aws:iam::763338924548:user/GD-user-temp"
+                      "arn:aws:iam::539225272086:user/GD-user-temp"
                     ]
                   },
                   "Condition": {
