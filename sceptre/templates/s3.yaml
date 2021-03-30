@@ -21,6 +21,10 @@ Parameters:
     Type: String
     Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
     Default: ""
+  ReadWriteDeleteRoles:
+    Type: CommaDelimitedList
+    Description: (Optional) List of IAM roles that will have read-write-delete access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
+    Default: ""
   VersioningStatus:
     Type: String
     Description: Versioning should be enabled unless there is good reason not to.
@@ -102,6 +106,7 @@ Conditions:
     - !Not [ !Condition DataLakeBucket ]
   NeedsCustomBucketPolicy: !Or
     - !Condition UseJSONCustomPolicy
+    - !Condition UseReadWriteDeleteRoles
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
