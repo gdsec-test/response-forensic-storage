@@ -6,7 +6,6 @@ parameters:
   OldVersionExpirationDays: "2557"
   EnableBucketMetrics: "true"
   DataLakeBucket: "false"
-  ReadWriteDeleteRoles: ""
   CustomBucketPolicyJSON:  '[
   {
     "Version": "2012-10-17",
