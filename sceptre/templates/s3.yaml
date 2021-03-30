@@ -108,6 +108,7 @@ Parameters:
     AllowedValues:
       - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
 Conditions:
+  IsPCI: !Equals [ !Ref OrgType, pci ]
   IsNonPCI: !Equals [ !Ref OrgType, non-pci ]
   DataLakeBucket: !And
     - !Equals [ !Ref DataLakeBucket, true ]
@@ -118,6 +119,12 @@ Conditions:
   NeedsCustomBucketPolicy: !Or
     - !Condition UseJSONCustomPolicy
     - !Condition DataLakeBucket
+  IsPublic: !And
+    - !Not [ !Condition IsPCI ]
+    - !Not [ !Condition DataLakeBucket ]
+    - !Or
+      - !Equals [ !Ref BucketPolicy, AuthenticatedRead ]
+      - !Equals [ !Ref BucketPolicy, PublicRead ]
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
