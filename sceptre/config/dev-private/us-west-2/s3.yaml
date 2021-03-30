@@ -1,6 +1,6 @@
 template_path: s3.yaml
 parameters:
-  ServiceCatalogVersion: 	"1.10.0"
+  ServiceCatalogVersion: 	1.10.0
   VersioningStatus: "Enabled"
   ExpirationDays: "2557"
   OldVersionExpirationDays: "2557"
