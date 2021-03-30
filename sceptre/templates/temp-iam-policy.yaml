@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy the IAM Custom Policy Service Catalog Product
+Parameters:
+  # Must be provided by region specific config if any based on requirement
+  PolicyNameSuffix:
+    Type: String
+    Description: Name of custom Policy appended to TeamName-custom-
+    Default: "SamplePolicyName"
+  DevelopmentTeam:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for team owning the created resources.
+    Default: /AdminParams/Team/Name
+    AllowedValues:
+      - /AdminParams/Team/Name
+  DevelopmentEnvironment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for development environment this will live in.
+    Default: /AdminParams/Team/Environment
+    AllowedValues:
+      - /AdminParams/Team/Environment
+
+Resources:
+  IAMPolicy:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: IAMPolicy
+      ProvisioningArtifactName: 1.0.0
+      ProvisionedProductName: temp-user-iam-policy
+      ProvisioningParameters:
+        - Key: PolicyNameSuffix
+          Value: !Ref PolicyNameSuffix
+        - Key: PolicyJSON
+          Value: !Sub |
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:Get*",
+                    "s3:List*",
+                    "s3:DeleteObject",
+                    "s3:AbortMultipartUpload"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}",
+                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
+                  ],
+                  "Principal": {
+                    "AWS": [
+                      "arn:aws:iam::763338924548:user/temp-user"
+                    ]
+                  }
+                },
+                {
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
+                  ],
+                  "Principal": {
+                    "AWS": [
+                      "arn:aws:iam::763338924548:user/temp-user"
+                    ]
+                  },
+                  "Condition": {
+                    "StringEquals": { "s3:x-amz-acl": "bucket-owner-full-control" }
+                  }
+                }
+              ]
+            }
+      Tags:
+        - Key: doNotShutDown
+          # change to false if it can be turned off outside of business hours
+          Value: "true"
