@@ -46,6 +46,8 @@ Resources:
                   "Resource": [
                     "arn:aws:s3:::poynt-server-logs",
                     "arn:aws:s3:::poynt-server-logs/*"
+                    "arn:aws:s3:::poynt-server-logs-ci",
+                    "arn:aws:s3:::poynt-server-logs-ci/*"
                   ]
                 },
                 {
