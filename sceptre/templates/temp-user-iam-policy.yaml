@@ -38,7 +38,7 @@ Resources:
                   "Action": [
                     "s3:Get*",
                     "s3:List*",
-                    "s3:AbortMultipartUpload"
+                    "s3:AbortMultipartUpload",
                     "s3:PutObject",
                     "s3:PutObjectAcl"
                   ],
