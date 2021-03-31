@@ -38,36 +38,26 @@ Resources:
                   "Action": [
                     "s3:Get*",
                     "s3:List*",
-                    "s3:DeleteObject",
                     "s3:AbortMultipartUpload"
+                    "s3:PutObject",
+                    "s3:PutObjectAcl"
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}",
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
-                  ],
-                  "Principal": {
-                    "AWS": [
-                      "arn:aws:iam::539225272086:user/GD-user-temp"
-                    ]
-                  }
+                    "arn:aws:s3:::test-threat-response",
+                    "arn:aws:s3:::test-threat-response/*"
+                  ]
                 },
                 {
                   "Action": [
-                    "s3:PutObject"
+                    "s3:ListBucket",
+                    "s3:PutObject",
+                    "s3:PutObjectAcl"
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
-                  ],
-                  "Principal": {
-                    "AWS": [
-                      "arn:aws:iam::539225272086:user/GD-user-temp"
-                    ]
-                  },
-                  "Condition": {
-                    "StringEquals": { "s3:x-amz-acl": "bucket-owner-full-control" }
-                  }
+                    "arn:aws:s3:::gd-respstorag-dev-forensic-storage/*"
+                  ]
                 }
               ]
             }
