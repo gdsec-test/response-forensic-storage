@@ -44,8 +44,8 @@ Resources:
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:s3:::test-threat-response",
-                    "arn:aws:s3:::test-threat-response/*"
+                    "arn:aws:s3:::poynt-server-logs",
+                    "arn:aws:s3:::poynt-server-logs/*"
                   ]
                 },
                 {
@@ -56,7 +56,7 @@ Resources:
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:s3:::gd-respstorag-dev-forensic-storage/*"
+                    "arn:aws:s3:::test-threat-response/*"
                   ]
                 }
               ]
