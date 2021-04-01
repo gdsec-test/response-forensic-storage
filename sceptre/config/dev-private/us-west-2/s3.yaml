@@ -16,7 +16,7 @@ parameters:
             "Sid": "Stmt1611277535086",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::149976299053:user/poynt/victor"
+                "AWS": "arn:aws:iam::763338924548:user/GD-user-temp"
             },
             "Action": "s3:PutObject",
             "Resource": [
@@ -32,7 +32,7 @@ parameters:
             "Sid": "Stmt1611277877767",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::149976299053:user/poynt/victor"
+                "AWS": "arn:aws:iam::763338924548:user/GD-user-temp"
             },
             "Action": [
               "s3:Get*",
