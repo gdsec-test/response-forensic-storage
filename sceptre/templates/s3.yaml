@@ -17,21 +17,6 @@ Parameters:
       - BucketOwnerFullControl
       - PublicRead
       - AuthenticatedRead
-  CustomBucketPolicyJSON:
-    Type: String
-    Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
-    Default: ""
-  ReadWriteDeleteRoles:
-    Type: CommaDelimitedList
-    Description: (Optional) List of IAM roles that will have read-write-delete access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
-    Default: ""
-  DataLakeBucket:
-    Type: String
-    Description: "(optional) Set to true to include the S3 bucket in the Enterprise Data Lake. Defaults to false. If enabled, The enterprise-wide Lake Formation will automatically have access to the bucket so that the data can be shared through the Glue catalog. Also, all lifecycle rules will be disabled so any parameters related to lifecycle rules such as ExpirationDays or MoveToGlacierStorageDays will be ignored, and versioning will always be enabled so VersioningStatus will also be ignored. This parameter will only affect buckets created in the non-pci organization. NOTE: Enabling this setting on an existing bucket will overwrite any existing custom bucket policy so please make sure that this is what you want!"
-    Default: false
-    AllowedValues:
-      - true
-      - false
   VersioningStatus:
     Type: String
     Description: Versioning should be enabled unless there is good reason not to.
@@ -107,24 +92,6 @@ Parameters:
     Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
     AllowedValues:
       - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
-Conditions:
-  IsPCI: !Equals [ !Ref OrgType, pci ]
-  IsNonPCI: !Equals [ !Ref OrgType, non-pci ]
-  DataLakeBucket: !And
-    - !Equals [ !Ref DataLakeBucket, true ]
-    - !Condition IsNonPCI
-  UseJSONCustomPolicy: !And
-    - !Not [ !Equals [ !Ref CustomBucketPolicyJSON, "" ] ]
-    - !Not [ !Condition DataLakeBucket ]
-  NeedsCustomBucketPolicy: !Or
-    - !Condition UseJSONCustomPolicy
-    - !Condition DataLakeBucket
-  IsPublic: !And
-    - !Not [ !Condition IsPCI ]
-    - !Not [ !Condition DataLakeBucket ]
-    - !Or
-      - !Equals [ !Ref BucketPolicy, AuthenticatedRead ]
-      - !Equals [ !Ref BucketPolicy, PublicRead ]
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -141,27 +108,9 @@ Resources:
           Value: 2557
         - Key: EnableBucketMetrics
           Value: true
-      PublicAccessBlockConfiguration: !If
-        - IsPublic
-        - !Ref "AWS::NoValue"
-        - BlockPublicAcls: false
-          BlockPublicPolicy: true
-          IgnorePublicAcls: false
-          RestrictPublicBuckets: true
       Tags:
         - Key: doNotShutDown
           Value: true
-  CustomBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Condition: NeedsCustomBucketPolicy
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument: !If
-        - UseJSONCustomPolicy
-        - !Ref CustomBucketPolicyJSON
-        - Version: 2012-10-17
-    DependsOn:
-      - S3Bucket
 Outputs:
   BucketName: 
     Description: "Name of created S3 Bucket"
