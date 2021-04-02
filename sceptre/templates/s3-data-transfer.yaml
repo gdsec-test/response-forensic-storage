@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Bucket where SIR will create folders for incident evidence
+Description: Template to allow for updating ACL so that I can transfer objects from a different account
 
 Parameters:
   ServiceCatalogVersion:
