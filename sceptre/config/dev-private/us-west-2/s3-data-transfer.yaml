@@ -1,4 +1,4 @@
-template_path: s3-data-transfer.yaml
+template_path s3-data-transfer.yaml
 parameters:
   ServiceCatalogVersion: 1.10.0
   BucketNameSuffix: "forensic-storage"
