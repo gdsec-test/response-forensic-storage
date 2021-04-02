@@ -42,10 +42,8 @@ Resources:
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:s3:::poynt-server-logs",
-                    "arn:aws:s3:::poynt-server-logs/*"
-                    "arn:aws:s3:::poynt-server-logs-ci",
-                    "arn:aws:s3:::poynt-server-logs-ci/*"
+                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
+                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
                   ]
                 },
                 {
