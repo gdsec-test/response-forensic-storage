@@ -55,7 +55,7 @@ Resources:
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:s3:::test-threat-response/*"
+                    "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage/*"
                   ]
                 }
               ]
