@@ -5,6 +5,12 @@ Parameters:
   ServiceCatalogVersion:
     Type: String
     Description: Service Catalog version for S3
+  BucketNameSuffix:
+    Type: String
+    MinLength: 1
+    Default: bucket1
+    AllowedPattern: "[a-z][a-z0-9-]+[a-z0-9]"
+    Description: Unique naming suffix for bucket
   BucketPolicy:
     Type: String
     Description: Bucket ACL to set
@@ -101,13 +107,13 @@ Resources:
       ProvisionedProductName: response-storage-bucket
       ProvisioningParameters:
         - Key: BucketNameSuffix
-          Value: forensic-storage
+          Value: !Ref BucketNameSuffix
         - Key: ExpirationDays
-          Value: 2557
+          Value: !Ref ExpirationDays
         - Key: OldVersionExpirationDays
-          Value: 2557
+          Value: !Ref OldVersionExpirationDays
         - Key: EnableBucketMetrics
-          Value: true
+          Value: !Ref EnableBucketMetrics
       Tags:
         - Key: doNotShutDown
           Value: true
