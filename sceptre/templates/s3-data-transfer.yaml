@@ -176,13 +176,6 @@ Resources:
                         "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
                         ]
                     }]}
-      PublicAccessBlockConfiguration: !If
-        - IsPublic
-        - !Ref "AWS::NoValue"
-        - BlockPublicAcls: false
-          BlockPublicPolicy: true
-          IgnorePublicAcls: false
-          RestrictPublicBuckets: true
       Tags:
         - Key: doNotShutDown
           Value: true
