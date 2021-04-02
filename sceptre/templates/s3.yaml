@@ -23,6 +23,13 @@ Parameters:
       - BucketOwnerFullControl
       - PublicRead
       - AuthenticatedRead
+  BucketOwnerPreferred:
+    Type: String
+    Description: Set to true to enable ownership controls with object ownership set to BucketOwnerPreferred. Otherwise the bucket will not have ownership controls so object ownership will default to ObjectWriter.
+    Default: false
+    AllowedValues:
+      - true
+      - false
   VersioningStatus:
     Type: String
     Description: Versioning should be enabled unless there is good reason not to.
@@ -114,6 +121,8 @@ Resources:
           Value: !Ref OldVersionExpirationDays
         - Key: EnableBucketMetrics
           Value: !Ref EnableBucketMetrics
+        - Key: BucketOwnerPreferred
+          Value: !Ref BucketOwnerPreferred
       Tags:
         - Key: doNotShutDown
           Value: true
