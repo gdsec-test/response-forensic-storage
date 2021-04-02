@@ -1,0 +1,202 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Bucket where SIR will create folders for incident evidence
+
+Parameters:
+  ServiceCatalogVersion:
+    Type: String
+    Description: Service Catalog version for S3
+  BucketNameSuffix:
+    Type: String
+    MinLength: 1
+    Default: bucket1
+    AllowedPattern: "[a-z][a-z0-9-]+[a-z0-9]"
+    Description: Unique naming suffix for bucket
+  BucketPolicy:
+    Type: String
+    Description: Bucket ACL to set
+    Default: Private
+    AllowedValues:
+      - Private
+      - LogDeliveryWrite
+      - AwsExecRead
+      - BucketOwnerRead
+      - BucketOwnerFullControl
+      - PublicRead
+      - AuthenticatedRead
+  CustomBucketPolicyJSON:
+    Type: String
+    Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
+    Default: ""
+  ReadWriteDeleteRoles:
+    Type: CommaDelimitedList
+    Description: (Optional) List of IAM roles that will have read-write-delete access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
+    Default: ""
+  DataLakeBucket:
+    Type: String
+    Description: "(optional) Set to true to include the S3 bucket in the Enterprise Data Lake. Defaults to false. If enabled, The enterprise-wide Lake Formation will automatically have access to the bucket so that the data can be shared through the Glue catalog. Also, all lifecycle rules will be disabled so any parameters related to lifecycle rules such as ExpirationDays or MoveToGlacierStorageDays will be ignored, and versioning will always be enabled so VersioningStatus will also be ignored. This parameter will only affect buckets created in the non-pci organization. NOTE: Enabling this setting on an existing bucket will overwrite any existing custom bucket policy so please make sure that this is what you want!"
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  VersioningStatus:
+    Type: String
+    Description: Versioning should be enabled unless there is good reason not to.
+    Default: Enabled
+    AllowedValues:
+      - Enabled
+      - Suspended
+      - Disabled
+  ExpirationDays:
+    Type: Number
+    Description: (optional) Days before expiring object. Set to -1 to never expire.
+    Default: -1
+    AllowedValues:
+      - -1
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+      - 180
+      - 365
+      - 1096
+      - 2557
+  OldVersionExpirationDays:
+    Type: Number
+    Description: (optional) Days before expiring outdated object versions. Set to -1 to never expire.
+    Default: 180
+    AllowedValues:
+      - -1
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+      - 180
+      - 365
+      - 1096
+      - 2557
+  EnableBucketMetrics:
+    Type: String
+    Description: Enable all available bucket metrics.
+    Default: false
+    AllowedValues:
+      - true
+      - false
+  DevelopmentTeam:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for team owning the created resources.
+    Default: /AdminParams/Team/Name
+    AllowedValues:
+      - /AdminParams/Team/Name
+  DevelopmentEnvironment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for development environment this will live in.
+    Default: /AdminParams/Team/Environment
+    AllowedValues:
+      - /AdminParams/Team/Environment
+  OrgType:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Business Unit of the Account.
+    Default: /AdminParams/Team/OrgType
+    AllowedValues:
+      - /AdminParams/Team/OrgType
+  EnvMode:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for development mode of the account.
+    Default: /AdminParams/Team/EnvMode
+    AllowedValues:
+      - /AdminParams/Team/EnvMode
+  AccessLogsBucket:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Access logs S3 bucket.
+    Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+    AllowedValues:
+      - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+Conditions:
+  IsPCI: !Equals [ !Ref OrgType, pci ]
+  IsNonPCI: !Equals [ !Ref OrgType, non-pci ]
+  DataLakeBucket: !And
+    - !Equals [ !Ref DataLakeBucket, true ]
+    - !Condition IsNonPCI
+  UseJSONCustomPolicy: !And
+    - !Not [ !Equals [ !Ref CustomBucketPolicyJSON, "" ] ]
+    - !Not [ !Condition DataLakeBucket ]
+  NeedsCustomBucketPolicy: !Or
+    - !Condition UseJSONCustomPolicy
+    - !Condition DataLakeBucket
+  IsPublic: !And
+    - !Not [ !Condition IsPCI ]
+    - !Not [ !Condition DataLakeBucket ]
+    - !Or
+      - !Equals [ !Ref BucketPolicy, AuthenticatedRead ]
+      - !Equals [ !Ref BucketPolicy, PublicRead ]
+Resources:
+  S3Bucket:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: S3
+      ProvisioningArtifactName: !Ref ServiceCatalogVersion
+      ProvisionedProductName: response-storage-bucket
+      ProvisioningParameters:
+        - Key: BucketNameSuffix
+          Value: !Ref BucketNameSuffix
+        - Key: ExpirationDays
+          Value: !Ref ExpirationDays
+        - Key: OldVersionExpirationDays
+          Value: !Ref OldVersionExpirationDays
+        - Key: EnableBucketMetrics
+          Value: !Ref EnableBucketMetrics
+        - Key: CustomBucketPolicyJSON
+          Value: !Sub |
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Principal": {
+                            "AWS": [
+                              "arn:aws:iam::539225272086:GD-temp-user"
+                            ]
+                          },
+                          "Action": [
+                            "s3:PutObject"
+                          ],
+                      "Resource": "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*",
+                      "Condition": {
+                        "StringEquals": {
+                                "s3:x-amz-acl": "bucket-owner-full-control"
+                                }
+                         }
+                     },
+                     {
+                        "Effect": "Allow",
+                        "Principal": {
+                          "AWS": [
+                            "arn:aws:iam::539225272086:user/GD-temp-user"
+                          ]
+                        },
+                        "Action": [
+                          "s3:Get*",
+                          "s3:List*",
+                          "s3:AbortMultipartUpload"
+                      ],
+                      "Resource": [
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
+                        ]
+                    }]}
+      PublicAccessBlockConfiguration: !If
+        - IsPublic
+        - !Ref "AWS::NoValue"
+        - BlockPublicAcls: false
+          BlockPublicPolicy: true
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: true
+      Tags:
+        - Key: doNotShutDown
+          Value: true
+Outputs:
+  BucketName:
+    Description: "Name of created S3 Bucket"
+    Value: !Ref S3Bucket
