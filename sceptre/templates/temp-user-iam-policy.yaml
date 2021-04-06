@@ -40,6 +40,7 @@ Resources:
                     "s3:List*",
                     "s3:PutObject",
                     "s3:CopyObject",
+                    "s3:UploadPartCopy",
                     "s3:AbortMultipartUpload"
                   ],
                   "Effect": "Allow",
@@ -54,7 +55,6 @@ Resources:
                   "Action": [
                     "s3:ListBucket",
                     "s3:PutObject",
-                    "s3:UploadPartCopy",
                     "s3:PutObjectAcl"
                   ],
                   "Effect": "Allow",
