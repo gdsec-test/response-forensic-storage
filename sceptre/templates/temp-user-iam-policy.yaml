@@ -56,6 +56,8 @@ Resources:
                   "Action": [
                     "s3:CopyObject",
                     "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:ListMultipartUploadParts",
                     "s3:PutObject",
                     "s3:PutObjectAcl",
                     "s3:PutObjectTagging",
