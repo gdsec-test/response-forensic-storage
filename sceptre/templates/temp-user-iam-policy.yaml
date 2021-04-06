@@ -39,7 +39,6 @@ Resources:
                     "s3:Get*",
                     "s3:List*",
                     "s3:PutObject",
-                    "s3:CopyObject",
                     "s3:UploadPartCopy",
                     "s3:AbortMultipartUpload"
                   ],
@@ -54,6 +53,7 @@ Resources:
                 {
                   "Action": [
                     "s3:ListBucket",
+                    "s3:CopyObject",
                     "s3:PutObject",
                     "s3:PutObjectAcl"
                   ],
