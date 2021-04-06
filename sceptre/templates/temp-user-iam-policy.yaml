@@ -39,6 +39,7 @@ Resources:
                     "s3:Get*",
                     "s3:List*",
                     "s3:PutObject",
+                    "s3:CopyObject",
                     "s3:AbortMultipartUpload"
                   ],
                   "Effect": "Allow",
