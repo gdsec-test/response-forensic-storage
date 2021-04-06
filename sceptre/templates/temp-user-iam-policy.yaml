@@ -36,11 +36,12 @@ Resources:
               "Statement": [
                 {
                   "Action": [
+                    "s3:AbortMultipartUpload",
+                    "s3:CopyObject",
                     "s3:Get*",
                     "s3:List*",
-                    "s3:CopyObject",
                     "s3:PutObject",
-                    "s3:AbortMultipartUpload"
+                    "s3:UploadPartCopy"
                   ],
                   "Effect": "Allow",
                   "Resource": [
@@ -52,10 +53,11 @@ Resources:
                 },
                 {
                   "Action": [
+                    "s3:CopyObject",
                     "s3:ListBucket",
                     "s3:PutObject",
-                    "s3:UploadPartCopy",
-                    "s3:PutObjectAcl"
+                    "s3:PutObjectAcl",
+                    "s3:UploadPartCopy"
                   ],
                   "Effect": "Allow",
                   "Resource": [
