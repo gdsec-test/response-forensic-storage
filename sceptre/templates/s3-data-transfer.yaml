@@ -139,7 +139,7 @@ Resources:
                             "s3:PutObject",
                             "s3:PutObjectAcl"
                           ],
-                      "Resource": "arn:aws:s3:::gd-respstorag-dev-forensic-storage/*",
+                      "Resource": "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*",
                       "Condition": {
                         "StringEquals": {
                                 "s3:x-amz-acl": "bucket-owner-full-control"
@@ -159,8 +159,8 @@ Resources:
                           "s3:AbortMultipartUpload"
                       ],
                       "Resource": [
-                        "arn:aws:s3:::gd-respstorag-dev-forensic-storage",
-                        "arn:aws:s3:::gd-respstorag-dev-forensic-storage/*"
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
                         ]
                     }]}
       Tags:
