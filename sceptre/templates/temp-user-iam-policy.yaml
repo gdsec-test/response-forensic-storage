@@ -36,7 +36,9 @@ Resources:
               "Statement": [
                 {
                   "Action": [
-                    "s3:*"
+                    "s3:Get*",
+                    "s3:List*",
+                    "s3:AbortMultipartUpload"
                   ],
                   "Effect": "Allow",
                   "Resource": [
@@ -48,7 +50,8 @@ Resources:
                 },
                 {
                   "Action": [
-                    "s3:*"
+                    "s3:PutObject",
+                    "s3:PutObjectAcl"
                   ],
                   "Effect": "Allow",
                   "Resource": [
