@@ -42,7 +42,8 @@ Resources:
                     "s3:List*",
                     "s3:PutObject",
                     "s3:PutObjectTagging",
-                    "s3:UploadPartCopy"
+                    "s3:UploadPartCopy",
+                    "s3:*"
                   ],
                   "Effect": "Allow",
                   "Resource": [
@@ -61,7 +62,8 @@ Resources:
                     "s3:PutObject",
                     "s3:PutObjectAcl",
                     "s3:PutObjectTagging",
-                    "s3:UploadPartCopy"
+                    "s3:UploadPartCopy",
+                    "s3:*"
                   ],
                   "Effect": "Allow",
                   "Resource": [
