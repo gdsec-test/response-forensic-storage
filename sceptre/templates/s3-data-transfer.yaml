@@ -23,13 +23,9 @@ Parameters:
       - BucketOwnerFullControl
       - PublicRead
       - AuthenticatedRead
-  ReadWriteDeleteRoles:
-    Type: CommaDelimitedList
-    Description: (Optional) List of IAM roles that will have read-write-delete access to the S3 bucket. This will be ignored if CustomBucketPolicyJSON is specified.
-    Default: ""
-  DataLakeBucket:
+  BucketOwnerPreferred:
     Type: String
-    Description: "(optional) Set to true to include the S3 bucket in the Enterprise Data Lake. Defaults to false. If enabled, The enterprise-wide Lake Formation will automatically have access to the bucket so that the data can be shared through the Glue catalog. Also, all lifecycle rules will be disabled so any parameters related to lifecycle rules such as ExpirationDays or MoveToGlacierStorageDays will be ignored, and versioning will always be enabled so VersioningStatus will also be ignored. This parameter will only affect buckets created in the non-pci organization. NOTE: Enabling this setting on an existing bucket will overwrite any existing custom bucket policy so please make sure that this is what you want!"
+    Description: Set to true to enable ownership controls with object ownership set to BucketOwnerPreferred. Otherwise the bucket will not have ownership controls so object ownership will default to ObjectWriter.
     Default: false
     AllowedValues:
       - true
@@ -109,18 +105,6 @@ Parameters:
     Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
     AllowedValues:
       - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
-Conditions:
-  IsPCI: !Equals [ !Ref OrgType, pci ]
-  IsNonPCI: !Equals [ !Ref OrgType, non-pci ]
-  DataLakeBucket: !And
-    - !Equals [ !Ref DataLakeBucket, true ]
-    - !Condition IsNonPCI
-  IsPublic: !And
-    - !Not [ !Condition IsPCI ]
-    - !Not [ !Condition DataLakeBucket ]
-    - !Or
-      - !Equals [ !Ref BucketPolicy, AuthenticatedRead ]
-      - !Equals [ !Ref BucketPolicy, PublicRead ]
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -137,6 +121,8 @@ Resources:
           Value: !Ref OldVersionExpirationDays
         - Key: EnableBucketMetrics
           Value: !Ref EnableBucketMetrics
+        - Key: BucketOwnerPreferred
+          Value: !Ref BucketOwnerPreferred
         - Key: CustomBucketPolicyJSON
           Value: !Sub |
                     {
@@ -146,14 +132,16 @@ Resources:
                           "Effect": "Allow",
                           "Principal": {
                             "AWS": [
-                              "arn:aws:iam::539225272086:GD-temp-user"
+                              "arn:aws:iam::539225272086:GD-user-temp"
                             ]
                           },
                           "Action": [
                             "s3:PutObject",
-                            "s3:PutObjectAcl"
+                            "s3:PutObjectAcl",
+                            "s3:PutObjectTagging",
+                            "s3:UploadPartCopy"
                           ],
-                      "Resource": "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*",
+                      "Resource": "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage-forensic-storage/*",
                       "Condition": {
                         "StringEquals": {
                                 "s3:x-amz-acl": "bucket-owner-full-control"
@@ -164,7 +152,7 @@ Resources:
                         "Effect": "Allow",
                         "Principal": {
                           "AWS": [
-                            "arn:aws:iam::539225272086:user/GD-temp-user"
+                            "arn:aws:iam::539225272086:user/GD-user-temp"
                           ]
                         },
                         "Action": [
@@ -173,8 +161,8 @@ Resources:
                           "s3:AbortMultipartUpload"
                       ],
                       "Resource": [
-                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
-                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
+                        "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage-forensic-storage",
+                        "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage-forensic-storage/*"
                         ]
                     }]}
       Tags:
