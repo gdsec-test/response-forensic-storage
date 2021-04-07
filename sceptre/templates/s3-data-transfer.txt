@@ -1,0 +1,49 @@
+When the IR team requires copying data to the Forensic Storage account's S3 bucket (Account A) from another AWS account (Account B) this document can be used as guide on how to configure Account B's S3 Bucket Policy so that Account A's IAM user "GD-user-temp" can access Account B's bucket and copy data from it.
+
+Working with Account B's owner, IR should be able to incorporate the line containing "- Key: CustomBucketPolicyJSON" and all of the Value section underneath it starting with "Value: !Sub |" this will change the S3 bucket policy so that the IAM user "GD-user-temp" has the permissions needed to access the bucket. After that change is incorporated into Account B's S3 Bucket Policy via Account B Owner's CI/CD pipeline, Account A's IAM user "GD-user-temp" will have access to the S3 bucket and AWS CLI can be used to copy objects over from Account B into Account A.
+
+In order to gain access to Account A's IAM user "GD-user-temp" credentials to perform actions with AWS CLI please follow documentation here, .
+
+Resources:
+  S3Bucket:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: S3
+      ProvisioningArtifactName: !Ref ServiceCatalogVersion
+      ProvisionedProductName: response-storage-bucket
+      ProvisioningParameters:
+        - Key: BucketNameSuffix
+          Value: !Ref BucketNameSuffix
+        - Key: ExpirationDays
+          Value: !Ref ExpirationDays
+        - Key: OldVersionExpirationDays
+          Value: !Ref OldVersionExpirationDays
+        - Key: EnableBucketMetrics
+          Value: !Ref EnableBucketMetrics
+        - Key: BucketOwnerPreferred
+          Value: !Ref BucketOwnerPreferred
+        - Key: CustomBucketPolicyJSON
+          Value: !Sub |
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                     {
+                        "Effect": "Allow",
+                        "Principal": {
+                          "AWS": [
+                            "arn:aws:iam::539225272086:user/GD-user-temp"
+                          ]
+                        },
+                        "Action": [
+                          "s3:Get*",
+                          "s3:List*",
+                          "s3:AbortMultipartUpload"
+                      ],
+                      "Resource": [
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
+                        ]
+                    }]}
+      Tags:
+        - Key: doNotShutDown
+          Value: true
