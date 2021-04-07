@@ -105,6 +105,7 @@ Parameters:
     Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
     AllowedValues:
       - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+
 Resources:
   S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -123,9 +124,32 @@ Resources:
           Value: !Ref EnableBucketMetrics
         - Key: BucketOwnerPreferred
           Value: !Ref BucketOwnerPreferred
+        - Key: CustomBucketPolicyJSON
+          Value: !Sub |
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                     {
+                        "Effect": "Allow",
+                        "Principal": {
+                          "AWS": [
+                            "arn:aws:iam::539225272086:user/GD-user-temp"
+                          ]
+                        },
+                        "Action": [
+                          "s3:Get*",
+                          "s3:List*",
+                          "s3:AbortMultipartUpload"
+                      ],
+                      "Resource": [
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
+                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
+                        ]
+                    }]}
       Tags:
         - Key: doNotShutDown
           Value: true
+
 Outputs:
   BucketName: 
     Description: "Name of created S3 Bucket"
