@@ -137,9 +137,7 @@ Resources:
                           },
                           "Action": [
                             "s3:PutObject",
-                            "s3:PutObjectAcl",
-                            "s3:PutObjectTagging",
-                            "s3:UploadPartCopy"
+                            "s3:PutObjectAcl"
                           ],
                       "Resource": "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage-forensic-storage/*",
                       "Condition": {
