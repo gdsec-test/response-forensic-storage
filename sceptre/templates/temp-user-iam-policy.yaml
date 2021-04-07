@@ -36,13 +36,6 @@ Resources:
               "Statement": [
                 {
                   "Action": [
-                    "s3:AbortMultipartUpload",
-                    "s3:CopyObject",
-                    "s3:Get*",
-                    "s3:List*",
-                    "s3:PutObject",
-                    "s3:PutObjectTagging",
-                    "s3:UploadPartCopy",
                     "s3:*"
                   ],
                   "Effect": "Allow",
@@ -55,14 +48,6 @@ Resources:
                 },
                 {
                   "Action": [
-                    "s3:CopyObject",
-                    "s3:ListBucket",
-                    "s3:ListBucketMultipartUploads",
-                    "s3:ListMultipartUploadParts",
-                    "s3:PutObject",
-                    "s3:PutObjectAcl",
-                    "s3:PutObjectTagging",
-                    "s3:UploadPartCopy",
                     "s3:*"
                   ],
                   "Effect": "Allow",
