@@ -116,6 +116,10 @@ Resources:
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix
+        - Key: BucketPolicy
+          Value: !Ref BucketPolicy
+        - Key: VersioningStatus
+          Value: !Ref VersioningStatus
         - Key: ExpirationDays
           Value: !Ref ExpirationDays
         - Key: OldVersionExpirationDays
@@ -124,28 +128,7 @@ Resources:
           Value: !Ref EnableBucketMetrics
         - Key: BucketOwnerPreferred
           Value: !Ref BucketOwnerPreferred
-        - Key: CustomBucketPolicyJSON
-          Value: !Sub |
-                    {
-                      "Version": "2012-10-17",
-                      "Statement": [
-                     {
-                        "Effect": "Allow",
-                        "Principal": {
-                          "AWS": [
-                            "arn:aws:iam::763338924548:user/GD-user-temp"
-                          ]
-                        },
-                        "Action": [
-                          "s3:Get*",
-                          "s3:List*",
-                          "s3:AbortMultipartUpload"
-                      ],
-                      "Resource": [
-                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
-                        "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
-                        ]
-                    }]}
+          
       Tags:
         - Key: doNotShutDown
           Value: true
