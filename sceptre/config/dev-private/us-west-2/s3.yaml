@@ -2,9 +2,9 @@ template_path: s3.yaml
 parameters:
   ServiceCatalogVersion: 1.10.0
   VersioningStatus: "Enabled"
-  ExpirationDays: "2557"
-  OldVersionExpirationDays: "2557"
-  BucketPolicy: "PublicRead"
+  ExpirationDays: "1461"
+  OldVersionExpirationDays: "1461"
+  BucketPolicy: "Private"
   EnableBucketMetrics: "true"
   DataLakeBucket: "false"
   CustomBucketPolicyJSON:  '[
