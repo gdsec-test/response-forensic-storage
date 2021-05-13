@@ -4,7 +4,7 @@ parameters:
   BucketNameSuffix: "forensic-storage"
   BucketPolicy: Private
   VersioningStatus: "Enabled"
-  ExpirationDays: "2557"
-  OldVersionExpirationDays: "2557"
+  ExpirationDays: "1461"
+  OldVersionExpirationDays: "1461"
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"

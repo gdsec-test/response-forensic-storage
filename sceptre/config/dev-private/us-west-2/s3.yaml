@@ -1,50 +1,10 @@
 template_path: s3.yaml
 parameters:
-  ServiceCatalogVersion: 1.10.0
+  ServiceCatalogVersion: 1.12.1
+  BucketNameSuffix: "forensic-storage"
+  BucketPolicy: Private
   VersioningStatus: "Enabled"
-  ExpirationDays: "2557"
-  OldVersionExpirationDays: "2557"
-  BucketPolicy: "PublicRead"
+  ExpirationDays: "1461"
+  OldVersionExpirationDays: "1461"
   EnableBucketMetrics: "true"
-  DataLakeBucket: "false"
-  CustomBucketPolicyJSON:  '[
-  {
-    "Version": "2012-10-17",
-    "Id": "Policy1611277539797",
-    "Statement": [
-        {
-            "Sid": "Stmt1611277535086",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::763338924548:user/GD-user-temp"
-            },
-            "Action": "s3:PutObject",
-            "Resource": [
-            "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
-            ],
-            "Condition": {
-                "StringEquals": {
-                    "s3:x-amz-acl": "bucket-owner-full-control"
-                }
-            }
-        },
-        {
-            "Sid": "Stmt1611277877767",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::763338924548:user/GD-user-temp"
-            },
-            "Action": [
-              "s3:Get*",
-              "s3:List*",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload"
-            ],
-            "Resource": [
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}",
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
-                  ]
-            }
-        ]
-    }
-  ]'
+  BucketOwnerPreferred: "true"
