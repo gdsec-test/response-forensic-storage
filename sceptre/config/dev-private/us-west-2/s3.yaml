@@ -8,3 +8,4 @@ parameters:
   OldVersionExpirationDays: "1461"
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
+  MoveToStandardIAStorageDays: "180"
