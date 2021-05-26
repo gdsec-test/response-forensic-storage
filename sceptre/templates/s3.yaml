@@ -38,6 +38,10 @@ Parameters:
       - Enabled
       - Suspended
       - Disabled
+  MoveToStandardIAStorageDays:
+    Type: Number
+    Description: (Optional) Days before moving objects to standard Infrequent Access storage. Set to -1 to never move. Defaults to never moving. Ignored if `CustomS3Bucket` is specified.
+    Default: -1
   ExpirationDays:
     Type: Number
     Description: (optional) Days before expiring object. Set to -1 to never expire.
@@ -106,6 +110,8 @@ Resources:
           Value: !Ref EnableBucketMetrics
         - Key: BucketOwnerPreferred
           Value: !Ref BucketOwnerPreferred
+        - Key: MoveToStandardIAStorageDays
+          Value: !Ref MoveToStandardIAStorageDays
           
       Tags:
         - Key: doNotShutDown
