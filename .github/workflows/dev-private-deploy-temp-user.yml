@@ -34,8 +34,5 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre launch -y dev-private/us-west-2/s3
-          sceptre launch -y dev-private/us-west-2/sir-iam-policy
-          sceptre launch -y dev-private/us-west-2/sir-iam-user
-          sceptre launch -y dev-private/us-west-2/threat-response-iam-policy
-          sceptre launch -y dev-private/us-west-2/threat-response-iam-user
+          sceptre launch -y dev-private/us-west-2/temp-user-iam-policy
+          sceptre launch -y dev-private/us-west-2/temp-user-iam-user
