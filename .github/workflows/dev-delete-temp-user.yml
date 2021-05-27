@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  delete_temp_user_dev_private:
+  delete_temp_user_dev:
     runs-on: ubuntu-latest
 
     steps:
