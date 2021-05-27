@@ -1,0 +1,38 @@
+name: ResponseStorage (DEV-PRIVATE)
+
+# Deploys the ResponseStorage main branch to the AWS DEV PRIVATE environment using sceptre.
+# This workflow runs on a self-hosted runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_to_dev_private:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@25a956c84d5dd820d28caab9f86b8d183aeeff3d
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@0309c38ebd10f90dfbb3889431bcf4ea38088012
+        with:
+          aws-access-key-id: ${{ secrets.DEV_PRIVATE_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_PRIVATE_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Dev-Private-Deploy
+          role-duration-seconds: 3600
+
+      - name: Setup python environment
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -U pip
+          pip install -U -r requirements.txt
+          
+      - name: Run sceptre
+        run: |
+          source venv/bin/activate
+          cd sceptre
+          sceptre launch -y dev-private/us-west-2/temp-user-iam-policy
+          sceptre launch -y dev-private/us-west-2/temp-user-iam-user
