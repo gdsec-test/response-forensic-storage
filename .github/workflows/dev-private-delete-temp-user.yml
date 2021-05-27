@@ -1,4 +1,4 @@
-name: ResponseStorage (DEV-PRIVATE)
+name: Delete Temp User(Dev-Private)
 
 # Deploys the ResponseStorage main branch to the AWS DEV PRIVATE environment using sceptre.
 # This workflow runs on a self-hosted runner
@@ -34,5 +34,5 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre delete -y dev-private/us-west-2/temp-user-iam-policy
-          sceptre delete -y dev-private/us-west-2/temp-user-iam-user
+          sceptre delete -y dev-private/us-west-2/temp-user-iam-policy.yaml
+          sceptre delete -y dev-private/us-west-2/temp-user-iam-user.yaml
