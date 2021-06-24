@@ -21,7 +21,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
-          role-duration-seconds: 3600
+          role-duration-seconds: 1200
 
       - name: Setup python environment
         run: |
@@ -34,7 +34,7 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre launch -y test/us-west-2/s3.yaml
+          sceptre launch -y test/eu-west-1/s3.yaml
           sceptre launch -y test/us-west-2/sir-iam-policy.yaml
           sceptre launch -y test/us-west-2/sir-iam-user.yaml
           sceptre launch -y test/us-west-2/threat-response-iam-policy.yaml
