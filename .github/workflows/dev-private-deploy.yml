@@ -35,7 +35,5 @@ jobs:
           source venv/bin/activate
           cd sceptre
           sceptre launch -y dev-private/eu-west-1/s3.yaml
-          sceptre launch -y dev-private/us-west-2/sir-iam-policy.yaml
           sceptre launch -y dev-private/us-west-2/sir-iam-user.yaml
-          sceptre launch -y dev-private/us-west-2/threat-response-iam-policy.yaml
           sceptre launch -y dev-private/us-west-2/threat-response-iam-user.yaml

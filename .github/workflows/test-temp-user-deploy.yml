@@ -34,5 +34,4 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre launch -y test/us-west-2/temp-user-iam-policy.yaml
           sceptre launch -y test/us-west-2/temp-user-iam-user.yaml
