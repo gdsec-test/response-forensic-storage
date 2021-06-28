@@ -1,13 +1,13 @@
-name: Delete Temp User (TEST)
+name: Deploy Temp User (TEST)
 
-# Deletes the IAM User "temp-user" from the AWS TEST environment using sceptre.
+# Deploys the IAM User "temp-user" to the AWS TEST environment using sceptre.
 # This workflow runs on a self-hosted runner
 
 on:
   workflow_dispatch:
 
 jobs:
-  delete_temp_user_test:
+  deploy_temp_user_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
-          role-duration-seconds: 3600
+          role-duration-seconds: 1200
 
       - name: Setup python environment
         run: |
@@ -34,5 +34,4 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre delete -y test/us-west-2/temp-user-iam-policy.yaml
-          sceptre delete -y test/us-west-2/temp-user-iam-user.yaml
+          sceptre launch -y test/us-west-2/temp-user-iam-user.yaml

@@ -1,5 +1,5 @@
 template_path: sir-iam-policy.yaml
 dependencies:
-  - {{environment}}/{{region}}/s3.yaml
+  - {{environment}}/eu-west-1/s3.yaml
 parameters:
   PolicyNameSuffix: "sir-iam-policy"
