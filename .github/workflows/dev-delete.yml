@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@25a956c84d5dd820d28caab9f86b8d183aeeff3d
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@0d9a5be0dceea74e09396820e1e522ba4a110d2f
         with:
@@ -29,11 +29,11 @@ jobs:
           source venv/bin/activate
           pip install -U pip
           pip install -U -r requirements.txt
-          
+
       - name: Run sceptre
         run: |
           source venv/bin/activate
-          cd sceptre          
+          cd sceptre
           sceptre delete -y dev/eu-west-1/s3.yaml
           sceptre delete -y dev/us-west-2/sir-iam-user.yaml
           sceptre delete -y dev/us-west-2/threat-response-iam-user.yaml
