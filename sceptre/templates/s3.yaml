@@ -112,12 +112,12 @@ Resources:
           Value: !Ref BucketOwnerPreferred
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
-          
+
       Tags:
         - Key: doNotShutDown
           Value: true
 
 Outputs:
-  BucketName: 
+  BucketName:
     Description: "Name of created S3 Bucket"
     Value: !Ref S3Bucket
