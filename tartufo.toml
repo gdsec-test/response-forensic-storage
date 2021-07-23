@@ -1,6 +1,6 @@
 [tool.tartufo]
 cleanup = true
-exclude-path-patterns = ".tartufo-excludes"
+exclude-paths = ".tartufo-excludes"
 exclude-signatures = [
 "8d6264c0ac5d31fb68e3c2fde6121042676c5d1260ca34e07e35a21e0aafca9e", # Signature for regex in template
 ]
