@@ -17,7 +17,7 @@ jobs:
           repository: gdcorp-actions/tartufo
           token: ${{ secrets.REPO_CLONE_TOKEN_SA_PAT }} # PAT with read access to gd-actions/tartufo
           path: tartufo # Relative to github working directory
-          ref: v2.0.1
+          ref: main
           persist-credentials: false
 
       - name: Run Tartufo
