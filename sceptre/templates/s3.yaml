@@ -117,7 +117,7 @@ Resources:
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
         - Key: ReadOnlyRoles
-          Value: !Join [",", !Ref ReadWriteDeleteRoles]
+          Value: !Join [",", !Ref ReadOnlyRoles]
 
       Tags:
         - Key: doNotShutDown
