@@ -85,7 +85,7 @@ Parameters:
       - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
 
 Resources:
-  S3Bucket:
+  RawS3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
     Properties:
       ProductName: S3

@@ -9,4 +9,4 @@ parameters:
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
   MoveToStandardIAStorageDays: "180"
-  ReadOnlyRoles: "arn:aws:iam::197818030129:role/respforens-custom-iam-ec2-role,arn:aws:iam::${AWS:AccountId}:role/GD-AWS-USA-GD-RespStorag-Ops"
+  ReadOnlyRoles: arn:aws:iam::197818030129:role/respforens-custom-iam-ec2-role,arn:aws:iam::${AWS:AccountId}:role/GD-AWS-USA-GD-RespStorag-Ops
