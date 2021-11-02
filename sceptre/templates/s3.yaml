@@ -98,7 +98,7 @@ Resources:
     Properties:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
-      ProvisionedProductName: response-storage-bucket
+      ProvisionedProductName: final-response-storage-bucket
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix
@@ -116,8 +116,72 @@ Resources:
           Value: !Ref BucketOwnerPreferred
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
-        - Key: ReadOnlyRoles
-          Value: !Join [",", !Ref ReadOnlyRoles]
+        #- Key: ReadOnlyRoles
+        #  Value: !Join [",", !Ref ReadOnlyRoles]
+        - Key: CustomBucketPolicyJSON
+          Value: !Sub |
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Effect": "Allow",
+                      "Principal": {
+                          "AWS": "arn:aws:iam::763338924548:root"
+                      },
+                      "Action": "s3:*",
+                      "Resource": [
+                          "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage",
+                          "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage/*"
+                      ]
+                  },
+                  {
+                      "Effect": "Allow",
+                      "Principal": {
+                          "AWS": "*"
+                      },
+                      "Action": [
+                          "s3:Get*",
+                          "s3:List*"
+                      ],
+                      "Resource": [
+                          "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage",
+                          "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage/*"
+                      ],
+                      "Condition": {
+                          "StringEquals": {
+                              "aws:PrincipalOrgID": "o-nkgi7akmvi"
+                          },
+                          "ArnEquals": {
+                              "aws:PrincipalArn": [
+                                  "arn:aws:iam::197818030129:role/respforens-custom-iam-ec2-role"                    ]
+                          }
+                      }
+                  },
+              {
+                      "Effect": "Deny",
+                      "Principal": {
+                          "AWS": "*"
+                      },
+                      "Action": [
+                          "s3:Delete*"
+                      ],
+                      "Resource": [
+                          "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage",
+                          "arn:aws:s3:::gd-respstorag-dev-private-forensic-storage/*"
+                      ],
+                      "Condition": {
+                          "StringEquals": {
+                              "aws:PrincipalOrgID": "o-nkgi7akmvi"
+                          },
+                          "ArnEquals": {
+                              "aws:PrincipalArn": [
+                                  "arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Ops"
+                              ]
+                          }
+                      }
+                  }
+              ]
+            }
 
       Tags:
         - Key: doNotShutDown
@@ -126,4 +190,4 @@ Resources:
 Outputs:
   BucketName:
     Description: "Name of created S3 Bucket"
-    Value: !Ref S3Bucket
+    Value: !Ref FinalS3Bucket

@@ -1,4 +1,6 @@
 template_path: s3-raw.yaml
+dependencies:
+  - {{environment}}/{{region}}/s3.yaml
 parameters:
   ServiceCatalogVersion: 1.13.2
   BucketNameSuffix: "raw-forensic-storage"
