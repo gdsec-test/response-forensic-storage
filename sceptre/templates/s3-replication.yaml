@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Bucket where SIR will create folders for incident evidence
+Description: Bucket used for replication of objects from s3.yaml bucket
 
 Parameters:
   ServiceCatalogVersion:
@@ -69,18 +69,32 @@ Parameters:
     Default: /AdminParams/Team/Environment
     AllowedValues:
       - /AdminParams/Team/Environment
-  ReplicationBucketsJSON:
-    Type: String
-    Description: (optional) Array of buckets `[{ name, [account] }]` in JSON format. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
-    Default: ""
+  OrgType:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Business Unit of the Account.
+    Default: /AdminParams/Team/OrgType
+    AllowedValues:
+      - /AdminParams/Team/OrgType
+  EnvMode:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for development mode of the account.
+    Default: /AdminParams/Team/EnvMode
+    AllowedValues:
+      - /AdminParams/Team/EnvMode
+  AccessLogsBucket:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Access logs S3 bucket.
+    Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+    AllowedValues:
+      - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
 
 Resources:
-  FinalS3Bucket:
+  ReplicationS3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
     Properties:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
-      ProvisionedProductName: final-response-storage-bucket
+      ProvisionedProductName: replication-response-storage-bucket
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix
@@ -98,9 +112,6 @@ Resources:
           Value: !Ref BucketOwnerPreferred
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
-        - Key: ReplicationBucketsJSON
-          Value: !Sub |
-            [{"name": "gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}-replica"}]
         - Key: CustomBucketPolicyJSON
           Value: !Sub |
             {
@@ -173,4 +184,4 @@ Resources:
 Outputs:
   BucketName:
     Description: "Name of created S3 Bucket"
-    Value: !Ref FinalS3Bucket
+    Value: !Ref ReplicationS3Bucket

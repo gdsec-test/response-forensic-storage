@@ -1,9 +1,7 @@
-template_path: s3.yaml
-dependencies:
-  - {{environment}}/eu-west-2/s3-replication.yaml
+template_path: s3-replication.yaml
 parameters:
   ServiceCatalogVersion: 1.13.1
-  BucketNameSuffix: "forensic-storage"
+  BucketNameSuffix: "forensic-storage-replica"
   BucketPolicy: Private
   VersioningStatus: "Enabled"
   ExpirationDays: "1461"
