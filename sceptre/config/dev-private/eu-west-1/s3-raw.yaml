@@ -8,4 +8,4 @@ parameters:
   ExpirationDays: "30"
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
-  ReadWriteDeleteRoles: "arn:aws:iam::197818030129:role/respforens-custom-iam-ec2-role"
+  ReadWriteDeleteRoles: "arn:aws:iam::{{respForensId}}:role/respforens-custom-iam-ec2-role"

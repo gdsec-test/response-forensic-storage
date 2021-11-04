@@ -53,36 +53,6 @@ Parameters:
     AllowedValues:
       - true
       - false
-  DevelopmentTeam:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for team owning the created resources.
-    Default: /AdminParams/Team/Name
-    AllowedValues:
-      - /AdminParams/Team/Name
-  DevelopmentEnvironment:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development environment this will live in.
-    Default: /AdminParams/Team/Environment
-    AllowedValues:
-      - /AdminParams/Team/Environment
-  OrgType:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: Business Unit of the Account.
-    Default: /AdminParams/Team/OrgType
-    AllowedValues:
-      - /AdminParams/Team/OrgType
-  EnvMode:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development mode of the account.
-    Default: /AdminParams/Team/EnvMode
-    AllowedValues:
-      - /AdminParams/Team/EnvMode
-  AccessLogsBucket:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: Access logs S3 bucket.
-    Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
-    AllowedValues:
-      - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
 
 Resources:
   RawS3Bucket:
