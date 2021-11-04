@@ -53,8 +53,8 @@ Resources:
                   ],
                   "Effect": "Allow",
                   "Resource": [
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
+                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage-raw",
+                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage-raw/*"
                   ]
                 }
               ]

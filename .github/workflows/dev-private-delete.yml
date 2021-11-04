@@ -34,7 +34,4 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre delete -y dev-private/eu-west-1/s3.yaml
-          sceptre delete -y dev-private/eu-west-1/s3-raw.yaml
-          sceptre delete -y dev-private/us-west-2/sir-iam-user.yaml
-          sceptre delete -y dev-private/us-west-2/threat-response-iam-user.yaml
+          sceptre delete -y dev-private/eu-west-1/s3-replication.yaml

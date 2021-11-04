@@ -3,7 +3,7 @@ dependencies:
   - {{environment}}/{{region}}/s3.yaml
 parameters:
   ServiceCatalogVersion: 1.13.2
-  BucketNameSuffix: "raw-forensic-storage"
+  BucketNameSuffix: "forensic-storage-raw"
   BucketPolicy: Private
   ExpirationDays: "30"
   EnableBucketMetrics: "true"

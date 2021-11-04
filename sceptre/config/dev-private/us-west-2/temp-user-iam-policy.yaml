@@ -1,5 +1,5 @@
 template_path: temp-user-iam-policy.yaml
 dependencies:
-  - {{environment}}/eu-west-1/s3.yaml
+  - {{environment}}/eu-west-1/s3-raw.yaml
 parameters:
   PolicyNameSuffix: "temp-user-iam-policy"
