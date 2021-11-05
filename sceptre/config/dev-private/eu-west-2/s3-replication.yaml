@@ -20,8 +20,8 @@ parameters:
               },
               "Action": "s3:*",
               "Resource": [
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{DevelopmentEnvironment}}-{{BucketNameSuffix}}",
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{DevelopmentEnvironment}}-{{BucketNameSuffix}}/*"
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
               ]
           },
           {
@@ -34,8 +34,8 @@ parameters:
                   "s3:List*"
               ],
               "Resource": [
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{DevelopmentEnvironment}}-{{BucketNameSuffix}}",
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{DevelopmentEnvironment}}-{{BucketNameSuffix}}/*"
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
               ],
               "Condition": {
                   "StringEquals": {
@@ -56,8 +56,8 @@ parameters:
                   "s3:Delete*"
               ],
               "Resource": [
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{DevelopmentEnvironment}}-{{BucketNameSuffix}}",
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{DevelopmentEnvironment}}-{{BucketNameSuffix}}/*"
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
               ],
               "Condition": {
                   "StringEquals": {

@@ -21,7 +21,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Dev-Deploy
-          role-duration-seconds: 1200
+          role-duration-seconds: 1800
 
       - name: Setup python environment
         run: |
@@ -34,7 +34,4 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre delete -y dev/eu-west-1/s3.yaml
-          sceptre delete -y dev/eu-west-1/s3-raw.yaml
-          sceptre delete -y dev/us-west-2/sir-iam-user.yaml
-          sceptre delete -y dev/us-west-2/threat-response-iam-user.yaml
+          sceptre delete -y dev/eu-west-1/s3-replication.yaml

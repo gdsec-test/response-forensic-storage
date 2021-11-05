@@ -57,21 +57,13 @@ Parameters:
     AllowedValues:
       - true
       - false
-  DevelopmentTeam:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for team owning the created resources.
-    Default: /AdminParams/Team/Name
-    AllowedValues:
-      - /AdminParams/Team/Name
-  DevelopmentEnvironment:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development environment this will live in.
-    Default: /AdminParams/Team/Environment
-    AllowedValues:
-      - /AdminParams/Team/Environment
   ReplicationBucketsJSON:
     Type: String
     Description: (optional) Array of buckets `[{ name, [account] }]` in JSON format. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
+    Default: ""
+  CustomBucketPolicyJSON:
+    Type: String
+    Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
     Default: ""
 
 Resources:
@@ -99,72 +91,9 @@ Resources:
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
         - Key: ReplicationBucketsJSON
-          Value: !Sub |
-            [{"name": "gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}-replica"}]
+          Value: !Ref ReplicationBucketsJSON
         - Key: CustomBucketPolicyJSON
-          Value: !Sub |
-            {
-              "Version": "2012-10-17",
-              "Statement": [
-                  {
-                      "Effect": "Allow",
-                      "Principal": {
-                          "AWS": "arn:aws:iam::763338924548:root"
-                      },
-                      "Action": "s3:*",
-                      "Resource": [
-                          "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}",
-                          "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
-                      ]
-                  },
-                  {
-                      "Effect": "Allow",
-                      "Principal": {
-                          "AWS": "*"
-                      },
-                      "Action": [
-                          "s3:Get*",
-                          "s3:List*"
-                      ],
-                      "Resource": [
-                          "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}",
-                          "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
-                      ],
-                      "Condition": {
-                          "StringEquals": {
-                              "aws:PrincipalOrgID": "o-nkgi7akmvi"
-                          },
-                          "ArnEquals": {
-                              "aws:PrincipalArn": [
-                                  "arn:aws:iam::197818030129:role/respforens-custom-iam-ec2-role"                    ]
-                          }
-                      }
-                  },
-              {
-                      "Effect": "Deny",
-                      "Principal": {
-                          "AWS": "*"
-                      },
-                      "Action": [
-                          "s3:Delete*"
-                      ],
-                      "Resource": [
-                          "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}",
-                          "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}/*"
-                      ],
-                      "Condition": {
-                          "StringEquals": {
-                              "aws:PrincipalOrgID": "o-nkgi7akmvi"
-                          },
-                          "ArnEquals": {
-                              "aws:PrincipalArn": [
-                                  "arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Ops"
-                              ]
-                          }
-                      }
-                  }
-              ]
-            }
+          Value: !Ref CustomBucketPolicyJSON
 
       Tags:
         - Key: doNotShutDown
