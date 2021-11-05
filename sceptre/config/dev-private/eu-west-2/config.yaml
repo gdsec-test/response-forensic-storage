@@ -1,1 +1,6 @@
 region: eu-west-2
+accountId: 763338924548
+forensAccountId: 197818030129
+DevelopmentTeam: respstorag
+DevelopmentEnvironment: dev-private
+BucketNameSuffix: forensic-storage-replica
