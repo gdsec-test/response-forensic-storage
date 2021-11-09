@@ -1,6 +1,4 @@
-template_path: s3.yaml
-dependencies:
-  - {{environment}}/eu-west-2/s3-replication.yaml
+template_path: s3-replication.yaml
 parameters:
   ServiceCatalogVersion: 1.13.1
   BucketNameSuffix: {{BucketNameSuffix}}
@@ -11,8 +9,6 @@ parameters:
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
   MoveToStandardIAStorageDays: "180"
-  ReplicationBucketsJSON: |
-    [{"name": "gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}-replica"}]
   CustomBucketPolicyJSON: |
     {
       "Version": "2012-10-17",
@@ -47,7 +43,7 @@ parameters:
                   },
                   "ArnEquals": {
                       "aws:PrincipalArn": [
-                          "arn:aws:iam::{{respForensId}}:role/respforens-custom-iam-ec2-role"                    ]
+                          "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"                    ]
                   }
               }
           },
