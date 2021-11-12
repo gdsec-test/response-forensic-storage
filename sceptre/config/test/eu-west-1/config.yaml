@@ -1,1 +1,5 @@
 region: eu-west-1
+accountId: 745293682974
+respForensId: #
+DevelopmentTeam: respstorag
+BucketNameSuffix: forensic-storage

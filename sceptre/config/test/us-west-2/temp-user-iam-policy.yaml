@@ -3,3 +3,32 @@ dependencies:
   - {{environment}}/eu-west-1/s3.yaml
 parameters:
   PolicyNameSuffix: "temp-user-iam-policy"
+  PolicyJSON: |
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "s3:Get*",
+            "s3:List*",
+            "s3:AbortMultipartUpload"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:s3:::<S3 Bucket Name>",
+            "arn:aws:s3:::<S3 Bucket Name/*>"
+          ]
+        },
+        {
+          "Action": [
+            "s3:PutObject",
+            "s3:PutObjectAcl"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw",
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw/*"
+          ]
+        }
+      ]
+    }

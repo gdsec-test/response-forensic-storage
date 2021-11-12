@@ -1,0 +1,11 @@
+template_path: s3-raw.yaml
+dependencies:
+  - {{environment}}/{{region}}/s3.yaml
+parameters:
+  ServiceCatalogVersion: 1.13.2
+  BucketNameSuffix: "forensic-storage-raw"
+  BucketPolicy: Private
+  ExpirationDays: "30"
+  EnableBucketMetrics: "true"
+  BucketOwnerPreferred: "true"
+  ReadWriteDeleteRoles: "arn:aws:iam::{{respForensId}}:role/respforens-custom-iam-ec2-role"
