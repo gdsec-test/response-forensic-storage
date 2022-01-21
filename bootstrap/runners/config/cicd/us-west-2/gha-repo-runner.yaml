@@ -1,0 +1,18 @@
+name: Create Runner
+project_code: ir-forensic-stroage-cicd #sceptre complains without a project_code
+region: us-west-2 #matches the region in your folder structure
+template_path: sc-gha-repo-runner.yaml
+parameters:
+  ProductVersion: 1.2.5
+  RunnerName: github-actions-runner
+  RunnerLabels: self-hosted,ir-forensic-storage-runners
+  RunnerAutoScalingGroupDesiredSize: "1"
+  RunnerVolumeSize: "40"
+  GitHubOrganization: gdcorp-infosec
+  GitHubRepository: response-forensic-storage
+  GitHubSecretName: /GitHub/Runner-Secrets
+  RunnerAutoScalingGroupWarmPoolSize: "2"
+  RunnerAutoScalingGroupSubnets: /AdminParams/VPC/DXAPPSubnets
+  RunnerAMIId: /GoldenAMI/gd-ubuntu20.04/latest
+  UseCICDRole: "true"
+  RunnerGroupName: "default"
