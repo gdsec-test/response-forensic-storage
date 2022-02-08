@@ -1,5 +1,5 @@
 name: Create Runner
-project_code: ir-forensic-stroage-cicd #sceptre complains without a project_code
+project_code: ir-forensic-storage-cicd #sceptre complains without a project_code
 region: us-west-2 #matches the region in your folder structure
 template_path: sc-gha-repo-runner.yaml
 parameters:

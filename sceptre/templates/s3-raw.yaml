@@ -53,6 +53,10 @@ Parameters:
     AllowedValues:
       - true
       - false
+  CustomBucketPolicyJSON:
+    Type: String
+    Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
+    Default: ""
 
 Resources:
   RawS3Bucket:
@@ -76,6 +80,8 @@ Resources:
           Value: !Ref BucketOwnerPreferred
         - Key: ReadWriteDeleteRoles
           Value: !Join [",", !Ref ReadWriteDeleteRoles]
+        - Key: CustomBucketPolicyJSON
+          Value: !Ref CustomBucketPolicyJSON
 
       Tags:
         - Key: doNotShutDown

@@ -8,4 +8,65 @@ parameters:
   ExpirationDays: "30"
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
-  ReadWriteDeleteRoles: "arn:aws:iam::{{respForensId}}:role/respforens-custom-iam-ec2-role"
+  CustomBucketPolicyJSON: |
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "AWS": "arn:aws:iam::{{accountId}}:root"
+          },
+          "Action": "s3:*",
+          "Resource": [
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw",
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw/*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Principal": {
+              "Service": "ssm.amazonaws.com"
+          },
+          "Action": [
+            "s3:Get*",
+            "s3:List*",
+            "s3:PutObject*"
+          ],
+          "Resource": [
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw/ssmLogs",
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw/ssmLogs/*"
+          ],
+          "Condition": {
+              "StringEquals": {
+              "aws:PrincipalOrgID": "o-nkgi7akmvi"
+            }
+          }
+        },
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "AWS": "*"
+          },
+          "Action": [
+            "s3:Get*",
+            "s3:List*",
+            "s3:PutObject*",
+            "s3:AbortMultipartUpload",
+            "s3:DeleteObject*"
+          ],
+          "Resource": [
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw",
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw/*"
+          ],
+          "Condition": {
+            "StringEquals": {
+              "aws:PrincipalOrgID": "o-nkgi7akmvi"
+            },
+            "ArnEquals": {
+              "aws:PrincipalArn": "arn:aws:iam::{{respForensId}}:role/respforens-custom-iam-ec2-role"
+            }
+          }
+        }
+      ]
+    }
