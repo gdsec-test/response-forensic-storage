@@ -1,17 +1,17 @@
-name: DEV-PRIVATE ResponseStorage - Deploy
+name: DEV ResponseStorage - Deploy
 
-# Deploys the ResponseStorage main branch to the AWS DEV PRIVATE environment using sceptre.
+# Deploys the ResponseStorage main branch to the AWS DEV environment using sceptre.
 # This workflow runs on a self-hosted runner
 
-# Can only be deployed manually through workflow_dispatch - Select your branch while running. This will limit the
+# Can only be deleted manually through workflow_dispatch - Select your branch while running. This will limit the
 # amount of active IAM resources in the account which will minimize noise in the aws Slack channel.
-# Deploy resources when dev resources are needed.
+# Delete resources when dev resources are no longer needed.
 
 on:
  workflow_dispatch:
 
 jobs:
-  deploy_to_dev_private:
+  deploy_to_dev:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,10 +21,10 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@0d9a5be0dceea74e09396820e1e522ba4a110d2f
         with:
-          aws-access-key-id: ${{ secrets.DEV_PRIVATE_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.DEV_PRIVATE_AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-          role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Dev-Private-Deploy
+          role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Dev-Deploy
           role-duration-seconds: 3600
 
       - name: Setup python environment
@@ -38,5 +38,4 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre launch -y dev-private/us-west-2/sir-iam-user.yaml
-          sceptre launch -y dev-private/us-west-2/threat-response-iam-user.yaml
+          sceptre delete -y dev/eu-west-2/s3-replication.yaml

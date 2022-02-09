@@ -3,9 +3,9 @@ name: DEV-PRIVATE ResponseStorage - Deploy
 # Deploys the ResponseStorage main branch to the AWS DEV PRIVATE environment using sceptre.
 # This workflow runs on a self-hosted runner
 
-# Can only be deployed manually through workflow_dispatch - Select your branch while running. This will limit the
+# Can only be deleted manually through workflow_dispatch - Select your branch while running. This will limit the
 # amount of active IAM resources in the account which will minimize noise in the aws Slack channel.
-# Deploy resources when dev resources are needed.
+# Delete resources when dev resources are no longer needed.
 
 on:
  workflow_dispatch:
@@ -38,5 +38,4 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre launch -y dev-private/us-west-2/sir-iam-user.yaml
-          sceptre launch -y dev-private/us-west-2/threat-response-iam-user.yaml
+          sceptre delete -y dev-private/eu-west-2/s3-replication.yaml
