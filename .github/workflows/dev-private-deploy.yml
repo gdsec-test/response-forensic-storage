@@ -4,7 +4,8 @@ name: DEV-PRIVATE ResponseStorage - Deploy
 # This workflow runs on a self-hosted runner
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ develop ] # Trigger workflow on all pushes to develop branch
 
 jobs:
   deploy_to_dev_private:

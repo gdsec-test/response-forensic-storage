@@ -67,12 +67,12 @@ Parameters:
     Default: ""
 
 Resources:
-  FinalS3Bucket:
+  S3Bucket:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
     Properties:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
-      ProvisionedProductName: final-response-storage-bucket
+      ProvisionedProductName: response-storage-bucket
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix
@@ -102,4 +102,4 @@ Resources:
 Outputs:
   BucketName:
     Description: "Name of created S3 Bucket"
-    Value: !Ref FinalS3Bucket
+    Value: !Ref S3Bucket

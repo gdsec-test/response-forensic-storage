@@ -39,7 +39,8 @@ parameters:
           ],
           "Condition": {
               "StringEquals": {
-              "aws:PrincipalOrgID": "o-nkgi7akmvi"
+              "aws:PrincipalOrgID": "o-nkgi7akmvi",
+              "aws:SourceAccount": "{{respForensId}}"
             }
           }
         },
