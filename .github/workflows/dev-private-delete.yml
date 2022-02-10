@@ -1,4 +1,4 @@
-name: DEV-PRIVATE ResponseStorage - Deploy
+name: DEV-PRIVATE ResponseStorage - Delete
 
 # Deploys the ResponseStorage main branch to the AWS DEV PRIVATE environment using sceptre.
 # This workflow runs on a self-hosted runner
@@ -11,7 +11,7 @@ on:
  workflow_dispatch:
 
 jobs:
-  deploy_to_dev_private:
+  delete_from_dev_private:
     runs-on: ubuntu-latest
 
     steps:

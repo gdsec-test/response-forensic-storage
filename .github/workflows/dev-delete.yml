@@ -1,4 +1,4 @@
-name: DEV ResponseStorage - Deploy
+name: DEV ResponseStorage - Delete
 
 # Deploys the ResponseStorage main branch to the AWS DEV environment using sceptre.
 # This workflow runs on a self-hosted runner
@@ -11,7 +11,7 @@ on:
  workflow_dispatch:
 
 jobs:
-  deploy_to_dev:
+  delete_from_dev:
     runs-on: ubuntu-latest
 
     steps:
