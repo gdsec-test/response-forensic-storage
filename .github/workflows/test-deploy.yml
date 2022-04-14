@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy_to_test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted,ir-forensic-storage-runners]
 
     steps:
       - name: Checkout

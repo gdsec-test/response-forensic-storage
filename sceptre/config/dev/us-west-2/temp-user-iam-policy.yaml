@@ -14,10 +14,7 @@ parameters:
             "s3:AbortMultipartUpload"
           ],
           "Effect": "Allow",
-          "Resource": [
-            "arn:aws:s3:::<S3 Bucket Name>",
-            "arn:aws:s3:::<S3 Bucket Name/*>"
-          ]
+          "Resource": "*"
         },
         {
           "Action": [

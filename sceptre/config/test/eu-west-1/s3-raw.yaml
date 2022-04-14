@@ -40,7 +40,7 @@ parameters:
           "Condition": {
               "StringEquals": {
               "aws:PrincipalOrgID": "o-nkgi7akmvi",
-              "aws:SourceAccount": "{{respForensId}}"
+              "aws:SourceAccount": "{{forensAccountId}}"
             }
           }
         },
@@ -65,7 +65,7 @@ parameters:
               "aws:PrincipalOrgID": "o-nkgi7akmvi"
             },
             "ArnEquals": {
-              "aws:PrincipalArn": "arn:aws:iam::{{respForensId}}:role/respforens-custom-iam-ec2-role"
+              "aws:PrincipalArn": "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"
             }
           }
         }
