@@ -8,7 +8,7 @@ on:
 
 jobs:
   delete_temp_user_test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
 
     steps:
       - name: Checkout

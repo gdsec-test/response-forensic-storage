@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy_to_test:
-    runs-on: [self-hosted,ir-forensic-storage-runners]
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
 
     steps:
       - name: Checkout
@@ -38,3 +38,4 @@ jobs:
           sceptre launch -y test/eu-west-1/s3.yaml
           sceptre launch -y test/us-west-2/sir-iam-user.yaml
           sceptre launch -y test/us-west-2/threat-response-iam-user.yaml
+          sceptre launch -y test/us-west-2/threat-CloudWatchAlarm.yaml

@@ -12,7 +12,7 @@ on:
 
 jobs:
   deploy_to_dev:
-    runs-on: [self-hosted,ir-forensic-storage-runners]
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
 
     steps:
       - name: Checkout
@@ -39,6 +39,6 @@ jobs:
           source venv/bin/activate
           cd sceptre
           sceptre launch -y dev/eu-west-1/s3-replication.yaml
-          sceptre launch -y dev/us-west-2/threat-SNSSlack.yaml
           sceptre launch -y dev/us-west-2/sir-iam-user.yaml
           sceptre launch -y dev/us-west-2/threat-response-iam-user.yaml
+          sceptre launch -y dev/us-west-2/threat-CloudWatchAlarm.yaml

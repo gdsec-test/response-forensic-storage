@@ -12,7 +12,7 @@ on:
 
 jobs:
   delete_from_dev:
-    runs-on: [self-hosted,ir-forensic-storage-runners]
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
 
     steps:
       - name: Checkout
@@ -38,4 +38,5 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre delete -y dev/eu-west-2/s3-replication.yaml
+          sceptre delete -y dev/us-west-2/sir-iam-policy.yaml
+          sceptre delete -y dev/us-west-2/threat-response-iam-policy.yaml

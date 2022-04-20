@@ -75,6 +75,16 @@ Parameters:
     AllowedValues:
       - false
       - true
+  RunnerVolumeSize:
+    Type: Number
+    Description: Size of Runner volumes in GB between 10 and 200.
+    Default: 20
+    MinValue: 10
+    MaxValue: 200
+  RunnerVersion:
+    Type: String
+    Description: Runner version
+    Default: "2.283.2"
 Resources:
   Instance:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
@@ -115,6 +125,10 @@ Resources:
           Value: !Ref RunnerAutoScalingGroupWarmPoolSize
         - Key: UseCICDRole
           Value: !Ref UseCICDRole
+        - Key: RunnerVolumeSize
+          Value: !Ref RunnerVolumeSize
+        - Key: RunnerVersion
+          Value: !Ref RunnerVersion
       Tags:
         - Key: doNotShutDown
           # allow shutdown in pre-prod for cost savings

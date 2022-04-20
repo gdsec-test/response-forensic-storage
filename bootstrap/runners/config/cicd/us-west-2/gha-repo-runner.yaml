@@ -1,11 +1,12 @@
 name: Create Runner
 project_code: ir-forensic-storage-cicd #sceptre complains without a project_code
 region: us-west-2 #matches the region in your folder structure
-template_path: sc-gha-repo-runner.yaml
+template_path: gha-repo-runner.yaml
 parameters:
-  ProductVersion: 1.2.5
+  ProductVersion: 1.3.4
   RunnerName: github-actions-runner
-  RunnerLabels: self-hosted,ir-forensic-storage-runners
+  RunnerVersion: "2.288.1"
+  RunnerLabels: self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage
   RunnerAutoScalingGroupDesiredSize: "1"
   RunnerVolumeSize: "40"
   GitHubOrganization: gdcorp-infosec
