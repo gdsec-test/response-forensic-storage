@@ -1,0 +1,27 @@
+template_path: threat-SC-CloudWatchAlarm.yaml
+dependencies:
+  - {{environment}}/{{region}}/threat-SNSSlack.yaml
+parameters:
+  ProductVersion: 4.0.0
+  AlarmActions: arn:aws:sns:{{region}}:{{accountId}}:{{threat_sns_slack_notify}}
+  AlarmDescription: "This alarm is triggered when the Threat team's S3 Bucket is over their 80GB limit"
+  AlarmName: "Threat Bucket Size over limit"
+  ComparisonOperator: GreaterThanOrEqualToThreshold
+  EvaluationPeriods: "1"
+  MetricName: BucketSizeBytes
+  Namespace: AWS/S3
+  Period: "86400"
+  Statistic: Maximum
+  Threshold: "80000000000"
+  TreatMissingData: notBreaching
+  DimensionsJSON: |
+    [
+      {
+        "Name": "BucketName",
+        "Value": "gd-{{DevelopmentTeam}}-{{environment}}-{{threatBucketName}}"
+      },
+      {
+        "Name": "StorageType",
+        "Value": "StandardStorage"
+      }
+    ]

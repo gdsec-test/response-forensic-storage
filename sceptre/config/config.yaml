@@ -1,1 +1,4 @@
 project_code: ForensicStorage
+threat_sns_slack_notify: threat-sns-bucketSize-notify
+threatBucketName: godaddy-threat-research-forensic
+DevelopmentTeam: respstorag

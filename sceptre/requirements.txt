@@ -2,3 +2,4 @@ awscli
 aws-okta-processor
 boto3
 sceptre
+sceptre-cmd-resolver

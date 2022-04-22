@@ -6,18 +6,9 @@ Parameters:
     Type: String
     Description: Name of custom Policy appended to TeamName-custom-
     Default: "SamplePolicyName"
-  DevelopmentTeam:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for team owning the created resources.
-    Default: /AdminParams/Team/Name
-    AllowedValues:
-      - /AdminParams/Team/Name
-  DevelopmentEnvironment:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development environment this will live in.
-    Default: /AdminParams/Team/Environment
-    AllowedValues:
-      - /AdminParams/Team/Environment
+  PolicyJSON:
+    Type: String
+    Description: JSON string of IAM Policy Document
 
 Resources:
   IAMPolicy:
@@ -30,35 +21,7 @@ Resources:
         - Key: PolicyNameSuffix
           Value: !Ref PolicyNameSuffix
         - Key: PolicyJSON
-          Value: !Sub |
-            {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Action": [
-                    "s3:Get*",
-                    "s3:List*",
-                    "s3:AbortMultipartUpload"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    "arn:aws:s3:::<S3 Bucket Name>",
-                    "arn:aws:s3:::<S3 Bucket Name/*>"
-                  ]
-                },
-                {
-                  "Action": [
-                    "s3:PutObject",
-                    "s3:PutObjectAcl"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": [
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage",
-                    "arn:aws:s3:::gd-${DevelopmentTeam}-${DevelopmentEnvironment}-forensic-storage/*"
-                  ]
-                }
-              ]
-            }
+          Value: !Ref PolicyJSON
       Tags:
         - Key: doNotShutDown
           # change to false if it can be turned off outside of business hours

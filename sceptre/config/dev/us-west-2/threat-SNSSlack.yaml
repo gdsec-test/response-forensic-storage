@@ -1,0 +1,7 @@
+template_path: threat-SNSSlack.yaml
+dependencies:
+  - {{environment}}/{{region}}/s3-threat.yaml
+stack_name: {{project_code}}-sns-slack-notify
+parameters:
+  SnsTopicName: {{ threat_sns_slack_notify }}
+  TeamSlackWebHook: !rcmd echo $(aws secretsmanager get-secret-value --secret-id threat_sns_slack_notify --query SecretString --output text)

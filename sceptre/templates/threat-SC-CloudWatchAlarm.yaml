@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudWatch Alarm for threat S3 bucket
+Parameters:
+  ProductVersion:
+    Type: String
+  AlarmActions:
+    Type: CommaDelimitedList
+    Description: (optional) The list of actions to execute when this alarm transitions into an ALARM state from any other state. Specify as an Amazon Resource Name (ARN).
+    Default: ""
+  AlarmDescription:
+    Type: String
+    Description: (optional) The description of the alarm.
+    Default: ""
+  AlarmName:
+    Type: String
+    Description: (optional) A name for the alarm.
+    Default: ""
+  ComparisonOperator:
+    Type: String
+    Description: The arithmetic operation to use when comparing the specified Statistic to Threshold.
+    AllowedValues:
+      - GreaterThanOrEqualToThreshold
+      - GreaterThanThreshold
+      - LessThanThreshold
+      - LessThanOrEqualToThreshold
+  DimensionsJSON:
+    Type: String
+    Description: (optional) JSON string defining a list of Dimensions.  See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cw-dimension.html for more information.
+    Default: "[]"
+  EvaluationPeriods:
+    Type: String
+    Description: The number of periods over which data is compared to the specified threshold.
+    Default: "1"
+    AllowedPattern: ^[0-9]+$
+  MetricName:
+    Type: String
+    Description: The name of the metric associated with the alarm.
+    Default: ""
+  Namespace:
+    Type: String
+    Description: The namespace of the metric associated with the alarm.
+    MaxLength: 256
+    Default: ""
+    AllowedPattern: (?![\S\s])|^[^:].*$
+  Period:
+    Type: String
+    Description: The time over which the specified statistic is applied. Specify time in seconds as 10, 30, 60, or in multiples of 60.
+    Default: ""
+    AllowedPattern: ^$|^10$|^30$|^60$|^[0-9]+[24680]0$
+  Statistic:
+    Type: String
+    Description: (either ExtendedStatistic or Statistic is required) The statistic to apply to the alarm's associated metric.
+    Default: ""
+    AllowedValues:
+      - ""
+      - SampleCount
+      - Average
+      - Sum
+      - Minimum
+      - Maximum
+  Threshold:
+    Type: String
+    Description: The value against which the specified statistic is compared.
+    AllowedPattern: ^-?[0-9]+(\.[0-9]*)?$
+  TreatMissingData:
+    Type: String
+    Description: Sets how this alarm is to handle missing data points.
+    Default: missing
+    AllowedValues:
+      - breaching
+      - notBreaching
+      - ignore
+      - missing
+  Unit:
+    Type: String
+    Description: (optional) The unit for the metric that is associated with the alarm.
+    Default: ""
+Resources:
+  CloudWatchAlarm:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: CloudWatchAlarm
+      ProvisioningArtifactName: !Ref ProductVersion
+      ProvisionedProductName: ThreatPercentUsageLimit
+      ProvisioningParameters:
+        - Key: AlarmActions
+          Value: !Join [ ",", !Ref AlarmActions ]
+        - Key: AlarmDescription
+          Value: !Ref AlarmDescription
+        - Key: ComparisonOperator
+          Value: !Ref ComparisonOperator
+        - Key: AlarmName
+          Value: !Ref AlarmName
+        - Key: EvaluationPeriods
+          Value: !Ref EvaluationPeriods
+        - Key: MetricName
+          Value: !Ref MetricName
+        - Key: Namespace
+          Value: !Ref Namespace
+        - Key: Period
+          Value: !Ref Period
+        - Key: Statistic
+          Value: !Ref Statistic
+        - Key: Threshold
+          Value: !Ref Threshold
+        - Key: Unit
+          Value: !Ref Unit
+        - Key: TreatMissingData
+          Value: !Ref TreatMissingData
+        - Key: DimensionsJSON
+          Value: !Ref DimensionsJSON
+      Tags:
+        - Key: doNotShutDown
+          # allow shutdown in pre-prod for cost savings
+          Value: true
