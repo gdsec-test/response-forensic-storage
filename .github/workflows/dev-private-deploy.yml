@@ -3,12 +3,16 @@ name: DEV-PRIVATE ResponseStorage - Deploy
 # Deploys the ResponseStorage main branch to the AWS DEV PRIVATE environment using sceptre.
 # This workflow runs on a self-hosted runner
 
+# Can only be deployed manually through workflow_dispatch - Select your branch while running. This will limit the
+# amount of active IAM resources in the account which will minimize noise in the aws Slack channel.
+# Deploy resources when dev resources are needed.
+
 on:
-  workflow_dispatch:
+ workflow_dispatch:
 
 jobs:
   deploy_to_dev_private:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
 
     steps:
       - name: Checkout
@@ -21,7 +25,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.DEV_PRIVATE_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Dev-Private-Deploy
-          role-duration-seconds: 1200
+          role-duration-seconds: 3600
 
       - name: Setup python environment
         run: |
@@ -34,6 +38,7 @@ jobs:
         run: |
           source venv/bin/activate
           cd sceptre
-          sceptre launch -y dev-private/eu-west-1/s3.yaml
+          sceptre launch -y dev-private/eu-west-1/s3-raw.yaml
           sceptre launch -y dev-private/us-west-2/sir-iam-user.yaml
           sceptre launch -y dev-private/us-west-2/threat-response-iam-user.yaml
+          sceptre launch -y dev-private/us-west-2/threat-CloudWatchAlarm.yaml

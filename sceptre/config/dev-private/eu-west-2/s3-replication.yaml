@@ -1,0 +1,74 @@
+template_path: s3-replication.yaml
+parameters:
+  ServiceCatalogVersion: 1.13.1
+  BucketNameSuffix: {{BucketNameSuffix}}
+  BucketPolicy: Private
+  VersioningStatus: "Enabled"
+  ExpirationDays: "1461"
+  OldVersionExpirationDays: "1461"
+  EnableBucketMetrics: "true"
+  BucketOwnerPreferred: "true"
+  MoveToStandardIAStorageDays: "180"
+  CustomBucketPolicyJSON: |
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "arn:aws:iam::{{accountId}}:root"
+              },
+              "Action": "s3:*",
+              "Resource": [
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+              ]
+          },
+          {
+              "Effect": "Allow",
+              "Principal": {
+                  "AWS": "*"
+              },
+              "Action": [
+                  "s3:Get*",
+                  "s3:List*"
+              ],
+              "Resource": [
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+              ],
+              "Condition": {
+                  "StringEquals": {
+                      "aws:PrincipalOrgID": "o-nkgi7akmvi"
+                  },
+                  "ArnEquals": {
+                      "aws:PrincipalArn": [
+                          "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"                    ]
+                  }
+              }
+          },
+      {
+              "Effect": "Deny",
+              "Principal": {
+                  "AWS": "*"
+              },
+              "Action": [
+                  "s3:Delete*"
+              ],
+              "Resource": [
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+              ],
+              "Condition": {
+                  "StringEquals": {
+                      "aws:PrincipalOrgID": "o-nkgi7akmvi"
+                  },
+                  "ArnEquals": {
+                      "aws:PrincipalArn": [
+                          "arn:aws:iam::{{accountId}}:role/GD-AWS-USA-GD-RespStorag-Ops"
+                      ]
+                  }
+              }
+          }
+      ]
+    }

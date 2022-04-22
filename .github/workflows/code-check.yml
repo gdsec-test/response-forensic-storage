@@ -6,7 +6,7 @@ on:
 
 jobs:
   tartufo:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
     steps:
       - name: Configure AWS credentials for ECR access
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2

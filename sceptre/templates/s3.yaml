@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Bucket where SIR will create folders for incident evidence
+Description: Bucket where encrypted incident evidence will be stored from the s3-raw.yaml bucket
 
 Parameters:
   ServiceCatalogVersion:
@@ -57,36 +57,14 @@ Parameters:
     AllowedValues:
       - true
       - false
-  DevelopmentTeam:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for team owning the created resources.
-    Default: /AdminParams/Team/Name
-    AllowedValues:
-      - /AdminParams/Team/Name
-  DevelopmentEnvironment:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development environment this will live in.
-    Default: /AdminParams/Team/Environment
-    AllowedValues:
-      - /AdminParams/Team/Environment
-  OrgType:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: Business Unit of the Account.
-    Default: /AdminParams/Team/OrgType
-    AllowedValues:
-      - /AdminParams/Team/OrgType
-  EnvMode:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: SSM Parameter for development mode of the account.
-    Default: /AdminParams/Team/EnvMode
-    AllowedValues:
-      - /AdminParams/Team/EnvMode
-  AccessLogsBucket:
-    Type: AWS::SSM::Parameter::Value<String>
-    Description: Access logs S3 bucket.
-    Default: /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
-    AllowedValues:
-      - /AdminParams/BaselineBucketNames/LOBAccessLogsBucket
+  ReplicationBucketsJSON:
+    Type: String
+    Description: (optional) Array of buckets `[{ name, [account] }]` in JSON format. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
+    Default: ""
+  CustomBucketPolicyJSON:
+    Type: String
+    Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
+    Default: ""
 
 Resources:
   S3Bucket:
@@ -112,6 +90,10 @@ Resources:
           Value: !Ref BucketOwnerPreferred
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
+        - Key: ReplicationBucketsJSON
+          Value: !Ref ReplicationBucketsJSON
+        - Key: CustomBucketPolicyJSON
+          Value: !Ref CustomBucketPolicyJSON
 
       Tags:
         - Key: doNotShutDown
