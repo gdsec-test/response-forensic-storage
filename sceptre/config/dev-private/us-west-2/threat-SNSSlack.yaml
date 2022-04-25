@@ -4,4 +4,5 @@ dependencies:
 stack_name: {{project_code}}-sns-slack-notify
 parameters:
   SnsTopicName: {{ threat_sns_slack_notify }}
+  #The secret needed for the TeamSlackWebHook parameter needs to be PUT in ASM manually before deploying this config. Also it needs to be stored as an "Other type of secret" and added as plaintext as a sinlge entry, not a Key:Value pair.
   TeamSlackWebHook: !rcmd echo $(aws secretsmanager get-secret-value --secret-id threat_sns_slack_notify --query SecretString --output text)
