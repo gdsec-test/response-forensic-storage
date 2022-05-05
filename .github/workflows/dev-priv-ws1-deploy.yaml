@@ -1,0 +1,38 @@
+name: DEV-PRIVATE Workstation-1 Deploy
+
+# This workflow runs on the CICD account's runners
+# This EC2 build includes installing dependencies required for SIFT installation onto the EC2 then backgrounding the SIFT installation processes so they will run on the EC2 instance after the dependency
+# installation is complete. This installation and build process takes ~50 minutes and can be monitored by listing running processes and grepping for "sift" in the process list.
+# This installation uses known good versions of GoLang and SIFT for installation by targeting static versions to pull from websites.
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_to_dev_private:
+    runs-on: [self-hosted,ir-forensic]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
+        with:
+          aws-access-key-id: ${{ secrets.DEV_PRIVATE_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_PRIVATE_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::197818030129:role/GD-AWS-USA-GD-RespForens-Dev-Private-Deploy
+          role-duration-seconds: 3600
+
+      - name: Setup python environment
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -U pip
+          pip install -U -r requirements.txt
+
+      - name: Run sceptre
+        run: |
+          source venv/bin/activate
+          cd sceptre
+          sceptre launch -y dev-private/eu-west-1/ec2-sift-build-1.yaml
