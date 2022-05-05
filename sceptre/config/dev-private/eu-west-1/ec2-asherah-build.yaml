@@ -1,0 +1,27 @@
+template_path: "ec2.yaml"
+parameters:
+  # This EC2 build includes installing dependencies required for SIFT installation onto the EC2 then backgrounding the SIFT installation processes so they will run on the EC2 instance after the dependency
+  # installation is complete. This installation and build process takes ~50 minutes and can be monitored by listing running processes and grepping for "sift" in the process list.
+  # This installation uses known good versions of GoLang and SIFT for installation by targeting static versions to pull from websites.
+  NameTag: sift-workstation-1
+  InstanceType: t3.2xlarge
+  AMIImageId: /GoldenAMI/gd-ubuntu20.04/latest
+  PrivateSubnetIds: /AdminParams/VPC/PrivateSubnets
+  PrivateSecurityGroupId: /AdminParams/VPC/PrivateSG
+  TagsCommaDelimitedList: '{"Key":"doNotShutDown", "Value":"false"}'
+  ImageOS: linux
+  UseUbuntu: "true"
+  CustomIAMRoleNameSuffix: "iam-ec2-role"
+  # SIFT installation
+  CustomUserData: "cd /tmp; sudo wget https://go.dev/dl/go1.17.3.linux-amd64.tar.gz; sudo tar -C /usr/local -xzf go1.17.3.linux-amd64.tar.gz; git clone https://github.com/sigstore/cosign; sudo wget https://github.com/teamdfir/sift-cli/releases/download/v1.14.0-rc1/sift-cli-linux; sudo wget https://github.com/teamdfir/sift-cli/releases/download/v1.14.0-rc1/sift-cli-linux.sig; sudo wget https://github.com/teamdfir/sift-cli/releases/download/v1.14.0-rc1/sift-cli.pub; sudo cp sift-cli-linux /usr/local/bin/sift; sudo chmod 755 /usr/local/bin/sift;cd /tmp/cosign;sudo /usr/local/go/bin/go install ./cmd/cosign;cd /tmp;sudo /root/go/bin/cosign verify-blob --key sift-cli.pub --signature sift-cli-linux.sig sift-cli-linux;if [ $? -eq 1 ];then echo \"signature validation failed\" >> /tmp/verify;else echo \"signature validation succeeded\" >> /tmp/verify;fi; sudo apt-get update; sudo apt-get upgrade -y; (sudo sift install --mode=server --user=ssm-user; echo \"1st done\" >> /tmp/verify ; sudo sift install --mode=server --user=ssm-user; echo \"2nd done\" >> /tmp/verify;)&"
+  BlockDeviceMappingsJSON: |-
+    [
+      {
+        "DeviceName": "/dev/sda1",
+        "Ebs": {
+          "VolumeType": "gp3",
+          "DeleteOnTermination": "true",
+          "VolumeSize": "500"
+        }
+      }
+    ]
