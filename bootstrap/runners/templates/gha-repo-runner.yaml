@@ -23,10 +23,6 @@ Parameters:
       - 'false'
     Default: 'false'
     Description: Flag to create org runner with a group instead of repository runner.
-  RunnerGroupName:
-    Type: String
-    AllowedPattern: "^(?!Default$).*$"
-    Description: Name of runner group for org runner. Default group is not allowed. Required when IsOrgRunner is true.
   GitHubSecretName:
     Type: String
     Description: "Name of the Secrets Manager secret containing 2 keys:
@@ -107,8 +103,6 @@ Resources:
           Value: !Ref GitHubRepository
         - Key: IsOrgRunner
           Value: !Ref IsOrgRunner
-        - Key: RunnerGroupName
-          Value: !Ref RunnerGroupName
         - Key: RunnerAutoScalingGroupDesiredSize
           Value: !Ref RunnerAutoScalingGroupDesiredSize
         - Key: GitHubSecretName
