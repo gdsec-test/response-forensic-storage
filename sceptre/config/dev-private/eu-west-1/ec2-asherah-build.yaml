@@ -13,7 +13,7 @@ parameters:
   UseUbuntu: "true"
   CustomIAMRoleNameSuffix: "iam-ec2-role"
   # SIFT installation
-  CustomUserData: "cd /tmp; sudo wget https://go.dev/dl/go1.17.3.linux-amd64.tar.gz; sudo tar -C /usr/local -xzf go1.17.3.linux-amd64.tar.gz; git clone https://github.com/sigstore/cosign; sudo wget https://github.com/teamdfir/sift-cli/releases/download/v1.14.0-rc1/sift-cli-linux; sudo wget https://github.com/teamdfir/sift-cli/releases/download/v1.14.0-rc1/sift-cli-linux.sig; sudo wget https://github.com/teamdfir/sift-cli/releases/download/v1.14.0-rc1/sift-cli.pub; sudo cp sift-cli-linux /usr/local/bin/sift; sudo chmod 755 /usr/local/bin/sift;cd /tmp/cosign;sudo /usr/local/go/bin/go install ./cmd/cosign;cd /tmp;sudo /root/go/bin/cosign verify-blob --key sift-cli.pub --signature sift-cli-linux.sig sift-cli-linux;if [ $? -eq 1 ];then echo \"signature validation failed\" >> /tmp/verify;else echo \"signature validation succeeded\" >> /tmp/verify;fi; sudo apt-get update; sudo apt-get upgrade -y; (sudo sift install --mode=server --user=ssm-user; echo \"1st done\" >> /tmp/verify ; sudo sift install --mode=server --user=ssm-user; echo \"2nd done\" >> /tmp/verify;)&"
+  CustomUserData: ""
   BlockDeviceMappingsJSON: |-
     [
       {
