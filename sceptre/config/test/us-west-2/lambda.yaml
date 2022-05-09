@@ -1,0 +1,9 @@
+template_path: SC_Lambda.yaml
+parameters:
+  ProvisionedArtifactName: {{ SC_Lambda }}
+  MemorySize: "128"
+  Timeout: "30"
+  LambdaName: "qs-example"
+  LambdaDescription: "This is example lambda function from quickstart"
+  LambdaZip: "quickstart/lambda.zip"
+  S3BucketName: "gd-team-lambda-bucket-prod-us-west-2"
