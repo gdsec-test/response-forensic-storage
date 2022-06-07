@@ -4,3 +4,4 @@ boto3
 sceptre
 tartufo
 pre-commit
+gh
