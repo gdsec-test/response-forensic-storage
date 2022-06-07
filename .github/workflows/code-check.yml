@@ -16,6 +16,7 @@ jobs:
           role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Dev-Private-Deploy
           role-duration-seconds: 1200                                 # default max is 7200
           aws-region: us-west-2                                       # set region you want to target
+          role-skip-session-tagging: true
 
       - name: Login to Amazon ECR
         id: login-ecr
