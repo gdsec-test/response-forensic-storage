@@ -2,6 +2,6 @@ awscli
 aws-okta-processor
 boto3
 sceptre
-tartufo
+sceptre-cmd-resolver
 pre-commit
-gh
+tartufo
