@@ -25,6 +25,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.CICD_AWS_SECRET_ACCESS_KEY }}
           role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
           aws-region: us-west-2
+          role-duration-seconds: 3600
 
       - name: Configure AWS credentials for Deploy Role
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
