@@ -1,11 +1,9 @@
 name: DEV ResponseStorage - Deploy
 
-# Deploys the ResponseStorage main branch to the AWS DEV environment using sceptre.
+# Deploys the ResponseStorage resources to the AWS DEV environment using sceptre.
 # This workflow runs on a self-hosted runner
 
-# Can only be deployed manually through workflow_dispatch - Select your branch while running. This will limit the
-# amount of active IAM resources in the account which will minimize noise in the aws Slack channel.
-# Deploy resources when dev resources are needed.
+# Can only be deployed manually through workflow_dispatch - Select your branch while running.
 
 on:
  workflow_dispatch:
@@ -26,18 +24,10 @@ jobs:
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
-      - name: Setup python environment
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U -r requirements.txt
-
       - name: Run sceptre
         run: |
-          source venv/bin/activate
+          pip install -U sceptre
           cd sceptre
-          sceptre launch -y dev/eu-west-1/s3-raw.yaml
+          sceptre launch -y dev/eu-west-1/s3.yaml
           sceptre launch -y dev/us-west-2/sir-iam-user.yaml
           sceptre launch -y dev/us-west-2/threat-response-iam-user.yaml
-          sceptre launch -y dev/us-west-2/threat-CloudWatchAlarm.yaml

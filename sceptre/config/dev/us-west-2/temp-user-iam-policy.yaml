@@ -1,6 +1,6 @@
 template_path: temp-user-iam-policy.yaml
 dependencies:
-  - {{environment}}/eu-west-1/s3-raw.yaml
+  - {{environment}}/eu-west-1/s3.yaml
 parameters:
   PolicyNameSuffix: "temp-user-iam-policy"
   PolicyJSON: |
@@ -23,8 +23,8 @@ parameters:
           ],
           "Effect": "Allow",
           "Resource": [
-            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw",
-            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw/*"
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage",
+            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage/*"
           ]
         }
       ]

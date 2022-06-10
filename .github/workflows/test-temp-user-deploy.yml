@@ -22,15 +22,8 @@ jobs:
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
-      - name: Setup python environment
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U -r requirements.txt
-
       - name: Run sceptre
         run: |
-          source venv/bin/activate
+          pip install -U sceptre
           cd sceptre
           sceptre launch -y test/us-west-2/temp-user-iam-user.yaml

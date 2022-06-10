@@ -1,11 +1,14 @@
 name: TEST ResponseStorage - Deploy
 
-# Deploys the ResponseStorage main branch to the AWS TEST environment using sceptre.
+# Deploys the ResponseStorage resources to the AWS TEST environment using sceptre.
 # This workflow runs on a self-hosted runner
 
 on:
-  push:
-    branches: [ develop ] # Trigger workflow on all pushes to develop branch
+  workflow_run:
+    workflows: ["Code quality check"]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
 
 jobs:
   deploy_to_test:
@@ -23,16 +26,9 @@ jobs:
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
-      - name: Setup python environment
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U -r requirements.txt
-
       - name: Run sceptre
         run: |
-          source venv/bin/activate
+          pip install -U sceptre
           cd sceptre
           sceptre launch -y test/eu-west-1/s3-raw.yaml
           sceptre launch -y test/us-west-2/sir-iam-user.yaml

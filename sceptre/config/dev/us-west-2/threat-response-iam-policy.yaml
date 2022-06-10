@@ -1,6 +1,6 @@
 template_path: threat-response-iam-policy.yaml
 dependencies:
-  - {{environment}}/eu-west-1/s3-raw.yaml
+  - {{environment}}/eu-west-1/s3.yaml
 parameters:
   PolicyNameSuffix: "threat-response-iam-policy"
   PolicyJSON: |
@@ -11,7 +11,7 @@ parameters:
             "s3:PutObject"
             ],
           "Effect": "Allow",
-          "Resource": "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage-raw/*"
+          "Resource": "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage/*"
         }
       ]
     }
