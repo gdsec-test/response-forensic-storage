@@ -52,5 +52,6 @@ jobs:
           aws-region: us-west-2
           role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
           role-duration-seconds: 1200
+          role-skip-session-tagging: true
 
     # Cirrus Scans
