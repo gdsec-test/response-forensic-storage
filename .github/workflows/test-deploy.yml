@@ -1,11 +1,14 @@
 name: TEST ResponseStorage - Deploy
 
-# Deploys the ResponseStorage main branch to the AWS TEST environment using sceptre.
+# Deploys the ResponseStorage resources to the AWS TEST environment using sceptre.
 # This workflow runs on a self-hosted runner
 
 on:
-  push:
-    branches: [ develop ] # Trigger workflow on all pushes to develop branch
+  workflow_run:
+    workflows: ["Code quality check"]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
 
 jobs:
   deploy_to_test:
@@ -18,23 +21,18 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
         with:
-          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
-          role-duration-seconds: 1200
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
 
-      - name: Setup python environment
+      - name: Run sceptre
         run: |
           python3 -m venv venv
           source venv/bin/activate
           pip install -U pip
-          pip install -U -r requirements.txt
-
-      - name: Run sceptre
-        run: |
-          source venv/bin/activate
+          pip install -U sceptre
           cd sceptre
-          sceptre launch -y test/eu-west-1/s3-raw.yaml
+          sceptre launch -y test/eu-west-1/s3.yaml
           sceptre launch -y test/us-west-2/sir-iam-user.yaml
           sceptre launch -y test/us-west-2/threat-response-iam-user.yaml

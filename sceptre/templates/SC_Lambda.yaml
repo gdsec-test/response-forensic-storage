@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Launch Lambda function product from SC
+Parameters:
+  ProvisionedArtifactName:
+    Type: String
+    Description: The provisioned artifact name.
+  MemorySize:
+    Type: Number
+    Description: The Memory Size of the Lambda function.
+    Default: 128
+  Timeout:
+    Type: Number
+    Description: Duration after which lambda times out.
+    Default: 30
+  VpcSubnetIds:
+    Type: AWS::SSM::Parameter::Value<List<String>>
+    Description: SSM parameter referencing the private dx subnet IDs
+    Default: /AdminParams/VPC/PrivateSubnets
+  VpcSecurityGroup:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>
+    Description: SSM parameter referencing the private security group ID
+    Default: /AdminParams/VPC/PrivateSG
+  LambdaName:
+    Type: String
+    Description: Name of lambda function
+  LambdaDescription:
+    Type: String
+    Description: Description about lambda function
+  S3BucketName:
+    Type: String
+    Description: S3 Bucket name where the lambda function zip is in.
+  LambdaZip:
+    Type: String
+    Description: Name of the zip file of a lambda funciton in S3 bucket
+Resources:
+  ExampleLambdaFunction:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: Lambda
+      ProvisioningArtifactName: !Ref ProvisionedArtifactName
+      ProvisionedProductName: lambda-function
+      ProvisioningParameters:
+        - Key: S3Bucket
+          Value: !Ref S3BucketName
+        - Key: S3Key
+          Value: !Ref LambdaZip
+        - Key: Handler
+          Value: index.handler
+        - Key: Runtime
+          Value: python3.8
+        - Key: MemorySize
+          Value: !Ref MemorySize
+        - Key: Timeout
+          Value: !Ref Timeout
+        - Key: VpcSubnetIds
+          Value: !Join [ ",", !Ref VpcSubnetIds ]
+        - Key: VpcSecurityGroups
+          Value: !Ref VpcSecurityGroup
+        - Key: S3ObjectVersion
+          Value: ""
+        - Key: LambdaName
+          Value: !Ref LambdaName
+        - Key: LambdaDescription
+          Value: !Ref LambdaDescription
+        - Key: DeadLetterConfigTargetArn
+          Value: ""
+        - Key: TracingConfig
+          Value: ""
+        - Key: ReservedConcurrentExecutions
+          Value: -1
+        - Key: TracingConfig
+          Value: ""
+      Tags:
+        - Key: doNotShutDown
+          Value: true
