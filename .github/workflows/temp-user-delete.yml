@@ -1,4 +1,4 @@
-name: Delete Temp User (PROD)
+name: Delete Temp Users
 
 # Deletes the IAM User "temp-user" from the AWS PROD environment using sceptre.
 # This workflow runs on a self-hosted runner

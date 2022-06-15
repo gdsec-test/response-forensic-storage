@@ -1,4 +1,4 @@
-name: Deploy Temp User (PROD)
+name: Deploy Temp Users
 
 # Deploys the IAM User "temp-user" to the AWS PROD environment using sceptre.
 # This workflow runs on a self-hosted runner
