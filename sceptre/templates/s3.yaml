@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Bucket where encrypted incident evidence will be stored from the s3-raw.yaml bucket
+Description: Bucket where incident evidence will be stored
 
 Parameters:
   ServiceCatalogVersion:

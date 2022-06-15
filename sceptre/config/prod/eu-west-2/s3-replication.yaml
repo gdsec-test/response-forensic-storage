@@ -1,6 +1,4 @@
-template_path: s3.yaml
-dependencies:
-  - {{environment}}/eu-west-2/s3-replication.yaml
+template_path: s3-replication.yaml
 parameters:
   ServiceCatalogVersion: 1.13.1
   BucketNameSuffix: {{BucketNameSuffix}}
@@ -11,8 +9,6 @@ parameters:
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
   MoveToStandardIAStorageDays: "180"
-  ReplicationBucketsJSON: |
-    [{"name": "gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}-replica"}]
   CustomBucketPolicyJSON: |
     {
       "Version": "2012-10-17",
@@ -51,27 +47,6 @@ parameters:
                   }
               }
           },
-        {
-          "Effect": "Allow",
-          "Principal": {
-              "Service": "ssm.amazonaws.com"
-          },
-          "Action": [
-            "s3:Get*",
-            "s3:List*",
-            "s3:PutObject*"
-          ],
-          "Resource": [
-            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage/ssmLogs",
-            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage/ssmLogs/*"
-          ],
-          "Condition": {
-              "StringEquals": {
-              "aws:PrincipalOrgID": "o-nkgi7akmvi",
-              "aws:SourceAccount": "{{forensAccountId}}"
-            }
-          }
-        },
       {
               "Effect": "Deny",
               "Principal": {

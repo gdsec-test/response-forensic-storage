@@ -8,7 +8,6 @@ on:
     workflows: ["Code quality check"]
     branches: [main]
     types: [completed]
-  workflow_dispatch:
 
 jobs:
   deploy_to_test:
