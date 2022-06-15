@@ -1,0 +1,104 @@
+name: Deploy Temp User (PROD)
+
+# Deploys the IAM User "temp-user" to the AWS PROD environment using sceptre.
+# This workflow runs on a self-hosted runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_temp_user_prod:
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
+        with:
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::710249649903:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Run sceptre
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -U pip
+          pip install -U sceptre
+          cd sceptre
+          sceptre launch -y prod/us-west-2/temp-user-iam-user.yaml
+
+  deploy_temp_user_dev_private:
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
+        with:
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Run sceptre
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -U pip
+          pip install -U sceptre
+          cd sceptre
+          sceptre launch -y dev-private/us-west-2/temp-user-iam-user.yaml
+
+  deploy_temp_user_dev:
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
+        with:
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Run sceptre
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -U pip
+          pip install -U sceptre
+          cd sceptre
+          sceptre launch -y dev/us-west-2/temp-user-iam-user.yaml
+
+  deploy_temp_user_test:
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
+        with:
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Run sceptre
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -U pip
+          pip install -U sceptre
+          cd sceptre
+          sceptre launch -y test/us-west-2/temp-user-iam-user.yaml
