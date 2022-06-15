@@ -45,6 +45,9 @@ jobs:
           role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Dev-Deploy
           role-duration-seconds: 3600
           role-skip-session-tagging: true
+
+      - name: Run sceptre
+        run: |
           python3 -m venv venv
           source venv/bin/activate
           pip install -U pip
