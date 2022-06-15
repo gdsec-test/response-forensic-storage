@@ -30,9 +30,7 @@ jobs:
           pip install -U sceptre
           cd sceptre
           sceptre launch -y dev-private/us-west-2/threat-SNSSlack.yaml
-
-      - name: Checkout
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+          unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
