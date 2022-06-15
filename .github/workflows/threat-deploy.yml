@@ -24,13 +24,10 @@ jobs:
 
       - name: Run sceptre
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
           pip install -U pip
           pip install -U sceptre
           cd sceptre
           sceptre launch -y dev-private/us-west-2/threat-SNSSlack.yaml
-          exit
           unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 
       - name: Configure AWS credentials
