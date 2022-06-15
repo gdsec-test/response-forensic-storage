@@ -30,9 +30,13 @@ jobs:
           pip install -U sceptre
           cd sceptre
           sceptre launch -y dev-private/us-west-2/threat-SNSSlack.yaml
-          unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
-          exit
-          unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+
+    deploy_to_dev:
+      runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
+
+      steps:
+        - name: Checkout
+          uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
@@ -41,7 +45,9 @@ jobs:
           role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Dev-Deploy
           role-duration-seconds: 3600
           role-skip-session-tagging: true
-
-      - name: Run sceptre
-        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -U pip
+          pip install -U sceptre
+          cd sceptre
           sceptre launch -y dev/us-west-2/threat-SNSSlack.yaml
