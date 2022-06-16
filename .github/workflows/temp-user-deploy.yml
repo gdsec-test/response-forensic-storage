@@ -1,4 +1,4 @@
-name: Deploy Temp User (PROD)
+name: Deploy Temp Users
 
 # Deploys the IAM User "temp-user" to the AWS PROD environment using sceptre.
 # This workflow runs on a self-hosted runner
@@ -42,7 +42,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
         with:
           aws-region: us-west-2
-          role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
+          role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Dev-Private-Deploy
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
@@ -66,7 +66,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
         with:
           aws-region: us-west-2
-          role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
+          role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Dev-Deploy
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
@@ -90,7 +90,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@05b148adc31e091bafbaf404f745055d4d3bc9d2
         with:
           aws-region: us-west-2
-          role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
+          role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 

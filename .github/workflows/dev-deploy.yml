@@ -1,4 +1,4 @@
-name: DEV ResponseStorage - Deploy
+name: Deploy DEV
 
 # Deploys the ResponseStorage resources to the AWS DEV environment using sceptre.
 # This workflow runs on a self-hosted runner

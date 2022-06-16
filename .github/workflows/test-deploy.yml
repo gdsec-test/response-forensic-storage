@@ -1,4 +1,4 @@
-name: TEST ResponseStorage - Deploy
+name: Deploy TEST
 
 # Deploys the ResponseStorage resources to the AWS TEST environment using sceptre.
 # This workflow runs on a self-hosted runner

@@ -1,4 +1,4 @@
-name: DEV-PRIVATE ResponseStorage - Deploy
+name: Deploy DEV-PRIVATE
 
 # Deploys the ResponseStorage resources to the AWS DEV PRIVATE environment using sceptre.
 # This workflow runs on a self-hosted runner
