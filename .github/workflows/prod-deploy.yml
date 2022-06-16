@@ -1,4 +1,4 @@
-name: PROD ResponseStorage - Deploy
+name: Deploy PROD
 
 # Deploys the ResponseStorage resources to the AWS DEV environment using sceptre.
 # This workflow runs on a self-hosted runner
@@ -13,7 +13,7 @@ on:
  workflow_dispatch:
 
 jobs:
-  deploy_to_dev:
+  deploy_to_prod:
     runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
     if: github.ref == 'refs/heads/main'
     steps:
