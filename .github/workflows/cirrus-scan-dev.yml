@@ -23,7 +23,7 @@ jobs:
           aws-access-key-id: ${{ secrets.CICD_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.CICD_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-          role-to-assume: arn:aws:iam::440237853478:role/GD-AWS-USA-GD-RespForens-CICD-Deploy
+          role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
           role-duration-seconds: 7200 # 2 hours
           role-session-name: cirrus-scan
 
