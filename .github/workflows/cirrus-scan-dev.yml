@@ -45,7 +45,7 @@ jobs:
           -e AWS_DEFAULT_REGION \
           -e TASK_LIST='["vulnscan","zaproxy"]' \
           -e GITHUB_URL="https://github.com/" \
-          -e GITHUB_AUTH=${{ secrets.CirrusScan }} \
+          -e GITHUB_AUTH=${{ secrets.CIRRUSSCAN }} \
           -e GITHUB_REPO=gdcorp-infosec/response-forensic-storage \
           -e GITHUB_COMMIT=${GITHUB_SHA} \
           ${{ secrets.AUDIT_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/cirrus-scan-cicd
