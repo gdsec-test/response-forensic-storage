@@ -1,0 +1,51 @@
+name: cirrus-scan
+
+on:
+  push:
+    branches: [ develop ] 
+  
+jobs:
+  cirrus-scan-dev:
+    runs-on: [self-hosted,ir-forensic]
+    # Config env vars as necessary for the job.
+    env:
+      AWS_REGION: us-west-2
+    # Only run if previous workflow is successful (e.g., tests are green) or it's another event that qualifies.
+    #if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e97d7fbc8e0e5af69631c13daa0f4b5a8d88165b # v1.5.5
+        with:
+          aws-access-key-id: ${{ secrets.CICD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.CICD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+          role-to-assume: arn:aws:iam::440237853478:role/GD-AWS-USA-GD-RespForens-CICD-Deploy
+          role-duration-seconds: 7200 # 2 hours
+          role-session-name: cirrus-scan
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@b9c809dc38d74cd0fde3c13cc4fe4ac72ebecdae # 2.2.2
+        with:
+          registries: ${{ secrets.AUDIT_ACCOUNT_ID }} # See https://github.com/gdcorp-appservices/cirrus-scan-cicd#cirrusscan-container-images for AUDIT_ACCOUNT_ID
+
+      - name: Pull latest CirrusScan container image
+        run: |
+          docker pull ${{ secrets.AUDIT_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/cirrus-scan-cicd:latest
+      # PAT supplied to GITHUB_AUTH below needs full repo access. cirrus-scan-cicd uses it to submit GitHub status webhook.
+      - name: Run CirrusScan checks
+        run: |
+          docker run --rm \
+          -e AWS_ACCESS_KEY_ID \
+          -e AWS_SECRET_ACCESS_KEY \
+          -e AWS_SESSION_TOKEN \
+          -e AWS_DEFAULT_REGION \
+          -e TASK_LIST='["vulnscan","zaproxy"]' \
+          -e GITHUB_URL="https://github.com/" \
+          -e GITHUB_AUTH=${{ secrets.CirrusScan }} \
+          -e GITHUB_REPO=gdcorp-infosec/response-forensic-storage \
+          -e GITHUB_COMMIT=${GITHUB_SHA} \
+          ${{ secrets.AUDIT_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/cirrus-scan-cicd
