@@ -21,8 +21,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e97d7fbc8e0e5af69631c13daa0f4b5a8d88165b # v1.5.5
         with:
-          aws-access-key-id: ${{ secrets.CICD_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.CICD_AWS_SECRET_ACCESS_KEY }}
+          role-skip-session-tagging: true
           aws-region: us-west-2
           role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
           role-duration-seconds: 7200 # 2 hours
