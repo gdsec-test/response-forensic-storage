@@ -47,7 +47,7 @@ parameters:
                   },
                   "ArnEquals": {
                       "aws:PrincipalArn": [
-                          "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"                    ]
+                          "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"
                   }
               }
           },
