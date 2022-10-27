@@ -28,7 +28,7 @@ jobs:
           role-session-name: cirrus-scan
 
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@b9c809dc38d74cd0fde3c13cc4fe4ac72ebecdae # 2.2.2
+        uses: aws-actions/amazon-ecr-login@eb9a709a709d0d6e4b34a02d34494041831f6999 # 2.2.2
         with:
           registries: ${{ secrets.AUDIT_ACCOUNT_ID }} # See https://github.com/gdcorp-appservices/cirrus-scan-cicd#cirrusscan-container-images for AUDIT_ACCOUNT_ID
 
