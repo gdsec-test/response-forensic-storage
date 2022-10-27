@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Manages the DataLake Administrators list for the local account.
+Parameters:
+  DataLakeAdminRoles:
+    Type: String
+    Description: A JSON list of string role names in the current account to add as account DataLake administrators.
+    Default: "[ ]"
+  GoDaddyLambdaBucket:
+    Type: String
+    Description: The SSM Parameter containing the location of the S3 bucket containing the lambda to deploy and run.
+    Default: /AdminParams/Team/GlobalBucket
+    AllowedValues:
+      - /AdminParams/Team/GlobalBucket
+      - /Team/Dev/LocalLambdaBucket
+  ProductVersion:
+    Type: String
+    Description: (optional) The Service Catalog product version to deploy.
+    Default: "1.0.1"
+Resources:
+  LocalDataLakeAdmins:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: DataLakeLocalDataAdmins
+      ProvisioningArtifactName: !Ref ProductVersion
+      ProvisionedProductName: "local-lake-admins"
+      ProvisioningParameters:
+        - Key: DataLakeAdminRoles
+          Value: !Ref DataLakeAdminRoles
+        - Key: GoDaddyLambdaBucket
+          Value: !Ref GoDaddyLambdaBucket
+      Tags:
+        - Key: doNotShutDown
+          Value: true
