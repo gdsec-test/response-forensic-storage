@@ -11,7 +11,7 @@ jobs:
       - name: Configure AWS credentials for ECR access
         uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838
         with:
-          role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
+          role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
           role-duration-seconds: 3600                                 # default max is 7200
           aws-region: us-west-2                                       # set region you want to target
           role-skip-session-tagging: true
@@ -45,7 +45,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838
         with:
           aws-region: us-west-2
-          role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
+          role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
           role-duration-seconds: 1200
           role-skip-session-tagging: true
 
