@@ -9,7 +9,7 @@ jobs:
     runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
     steps:
       - name: Configure AWS credentials for ECR access
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838
+        uses: aws-actions/configure-aws-credentials@eb9a709a709d0d6e4b34a02d34494041831f6999
         with:
           role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
           role-duration-seconds: 3600                                 # default max is 7200
