@@ -1,6 +1,11 @@
 [tool.tartufo]
-cleanup = true
-exclude-path-patterns = ".tartufo-excludes"
-json = false
+repo-path = "."
+json = true
 regex = true
 entropy = true
+exclude-path-patterns = [
+    {path-pattern = 'tartufo.toml', reason='Exclude tartufo config'},
+    {path-pattern = '\.github/[W|w]orkflows/', reason='Exclude Github Actions'},
+    {path-pattern = 'README.md', reason='Exclude ReadMe file'},
+    {path-pattern = 'sceptre/templates/s3.yaml', reason = 'Exclude references and IAM resources that flag as high entropy'}
+    ]
