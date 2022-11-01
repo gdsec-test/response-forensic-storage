@@ -1,52 +1,18 @@
-name: Code quality check
+name: Tartufo scan
 
 on:
   pull_request:
-    branches: [ main ]
-
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+    
 jobs:
   tartufo:
-    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
+    runs-on: [self-hosted,ir-forensic]
     steps:
-      - name: Configure AWS credentials for ECR access
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838
-        with:
-          role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
-          role-duration-seconds: 3600                                 # default max is 7200
-          aws-region: us-west-2                                       # set region you want to target
-          role-skip-session-tagging: true
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@eb9a709a709d0d6e4b34a02d34494041831f6999
-
-      - name: Docker login for Golden Containers ECR
-        env:
-          ECR_REGISTRY: 764525110978.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com # Do NOT change (region pulled from above)!
-        run: |
-          echo "Using: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
-
       - name: Checkout GoDaddy Actions repo # Checkout shared actions repository gd-actions
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
-        with:
-          repository: gdcorp-actions/tartufo
-          token: ${{ secrets.REPO_CLONE_TOKEN_SA_PAT }} # PAT with read access to gd-actions/tartufo
-          path: tartufo # Relative to github working directory
-          ref: main
-          persist-credentials: false
 
       - name: Run Tartufo
-        uses: ./tartufo # Relative reference to action in gd-actions repository
-        with:
-          github_token: ${{ secrets.REPO_CLONE_TOKEN_SA_PAT }}
-
-      - name: Setting up AWS user for tests
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838
-        with:
-          aws-region: us-west-2
-          role-to-assume: arn:aws:iam::141785225513:role/GD-AWS-USA-GD-RespStorag-CICD-Deploy
-          role-duration-seconds: 1200
-          role-skip-session-tagging: true
-
-    # Cirrus Scans
+        uses: godaddy/tartufo-action@33033cb8afa81b06baee5bf86604cb1974d4e6b4
