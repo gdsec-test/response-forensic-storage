@@ -7,7 +7,7 @@ on:
     - cron: '59 23 1 1/3 *'  
 jobs:
   cirrus-scan-dev:
-    runs-on: [self-hosted,ir-forensic]
+    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
     # Config env vars as necessary for the job.
     env:
       AWS_REGION: us-west-2
