@@ -9,7 +9,3 @@ exclude-path-patterns = [
     {path-pattern = 'README.md', reason='Exclude ReadMe file'},
     {path-pattern = 'sceptre/templates/s3.yaml', reason = 'Exclude references and IAM resources that flag as high entropy'}
     ]
-
-exclude-entropy-patterns = [
-    {path-pattern = 'sceptre/templates/s3.yaml', pattern = 'role/GD-APPSVCS-LambdaExecutionRole', reason = 'IAM Role'}
-    ]
