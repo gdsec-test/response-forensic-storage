@@ -1,22 +1,22 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Deploy the temp IAMUser for to be able to store evidence in S3 bucket.
+Description: Deploys an IAM User
 Parameters:
   UserName:
     Type: String
     Description: A name for the IAM user.
+  PolicyName:
+    Type: String
+    Description: A policy name.
   CustomPolicySuffix:
     Type: String
     Description: Suffix name of custom policy.
-  PolicyName:
-    Type: String
-    Description: A policy name from the pre defined list.
 Resources:
   IAMUser:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
     Properties:
       ProductName: IAMUser
       ProvisioningArtifactName: 3.2.0
-      ProvisionedProductName: temp-user-iam-user
+      ProvisionedProductName: !Sub ${UserName}-iam-user
       ProvisioningParameters:
         - Key: UserName
           Value: !Ref UserName

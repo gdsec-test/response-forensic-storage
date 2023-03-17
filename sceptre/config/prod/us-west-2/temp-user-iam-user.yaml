@@ -1,7 +1,0 @@
-template_path: temp-user-iam-user.yaml
-dependencies:
-  - {{environment}}/{{region}}/temp-user-iam-policy.yaml
-parameters:
-  UserName: "GD-user-temp"
-  PolicyName: "CustomPolicy"
-  CustomPolicySuffix: "temp-user-iam-policy"

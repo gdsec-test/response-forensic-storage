@@ -1,4 +1,4 @@
-template_path: temp-user-iam-user.yaml
+template_path: iam-user.yaml
 dependencies:
   - {{environment}}/{{region}}/temp-user-iam-policy.yaml
 parameters:
