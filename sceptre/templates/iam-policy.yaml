@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Deploy the IAM Custom Policy Service Catalog Product
+Description: Deploys a custom IAM Policy
 Parameters:
   # Must be provided by region specific config if any based on requirement
   PolicyNameSuffix:
@@ -16,7 +16,7 @@ Resources:
     Properties:
       ProductName: IAMPolicy
       ProvisioningArtifactName: 1.0.0
-      ProvisionedProductName: temp-user-iam-policy
+      ProvisionedProductName: !Sub ${PolicyNameSuffix}-iam-policy
       ProvisioningParameters:
         - Key: PolicyNameSuffix
           Value: !Ref PolicyNameSuffix

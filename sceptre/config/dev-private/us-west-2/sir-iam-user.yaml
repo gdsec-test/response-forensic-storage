@@ -1,4 +1,4 @@
-template_path: sir-iam-user.yaml
+template_path: iam-user.yaml
 dependencies:
   - {{environment}}/{{region}}/sir-iam-policy.yaml
 parameters:

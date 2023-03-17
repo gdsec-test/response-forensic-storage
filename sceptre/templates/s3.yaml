@@ -72,7 +72,7 @@ Resources:
     Properties:
       ProductName: S3
       ProvisioningArtifactName: !Ref ServiceCatalogVersion
-      ProvisionedProductName: response-storage-bucket
+      ProvisionedProductName: !Sub ${BucketNameSuffix}-s3-bucket
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix

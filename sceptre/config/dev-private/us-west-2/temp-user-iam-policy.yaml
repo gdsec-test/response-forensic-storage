@@ -1,4 +1,4 @@
-template_path: temp-user-iam-policy.yaml
+template_path: iam-policy.yaml
 dependencies:
   - {{environment}}/eu-west-1/s3.yaml
 parameters:
