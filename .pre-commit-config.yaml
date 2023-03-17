@@ -1,19 +1,30 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: f71fa2c1f9cf5cb705f73dffe4b21f7c61470ba9  # frozen: v4.4.0
     hooks:
       - id: trailing-whitespace
+        args: [ --markdown-linebreak-ext=md ]
       - id: end-of-file-fixer
       - id: check-json
       - id: check-xml
       - id: check-toml
+      - id: check-yaml
+        args: ['--unsafe'] # needed so it does not block Sceptre/CFN YAML files (we check these later)
       - id: detect-private-key
-      - id: end-of-file-fixer
+      - id: forbid-new-submodules
       - id: mixed-line-ending
+      - id: check-added-large-files
       - id: check-symlinks
       - id: check-merge-conflict
-      - id: check-byte-order-marker
+      - id: fix-byte-order-marker
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
   - repo: https://github.com/godaddy/tartufo
-    rev: v2.7.1
+    rev: a6e3909ccbc5da924c3483966d39a5ba8c6e3ddd  # frozen: v4.0.1
     hooks:
       - id: tartufo
+  - repo: https://github.com/aws-cloudformation/cfn-lint # used to be at https://github.com/aws-cloudformation/cfn-python-lint
+    rev: bd28275c7856f8c918a99a32e882ff9456c5c98e  # frozen: v0.74.1
+    hooks:
+      - id: cfn-python-lint
+        files: sceptre/templates/(.*/)*.*\.(yml|yaml)$
