@@ -1,0 +1,5 @@
+template_path: stub.yaml
+obsolete: True
+stack_name: !rcmd exit 1
+dependencies:
+  - {{environment}}/{{region}}/threat-SNSSlack.yaml

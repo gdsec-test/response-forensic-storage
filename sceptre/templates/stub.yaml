@@ -1,0 +1,27 @@
+# This is a stack that does not create any resources
+# This is used to delete obsolete stacks we cannot manage anymore for whatever reason
+# To use this stack, create the following config file, and execute it using
+#   sceptre launch --prune <file>
+# or
+#   sceptre prune <file>
+#####
+# stack_name: <name of stack to be deleted>
+# obsolete: True
+# template:
+#   path: stub.yaml
+#   type: file
+#####
+
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W8003  # Fn::Equals element will alway return false
+
+Conditions:
+  Never: !Equals [ "A", "B" ]
+
+Resources:
+  NonResource:
+    Type: Custom::NonResource
+    Condition: Never
