@@ -31,6 +31,27 @@ parameters:
           {
               "Effect": "Allow",
               "Principal": {
+                  "Service": "ssm.amazonaws.com"
+          },
+              "Action": [
+                  "s3:Get*",
+                  "s3:List*",
+                  "s3:PutObject*"
+              ],
+              "Resource": [
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs",
+                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs/*"
+              ],
+              "Condition": {
+                  "StringEquals": {
+                  "aws:PrincipalOrgID": "o-nkgi7akmvi",
+                  "aws:SourceAccount": "{{forensAccountId}}"
+                  }
+              }
+            },
+          {
+              "Effect": "Allow",
+              "Principal": {
                   "AWS": "*"
               },
               "Action": [
@@ -47,31 +68,10 @@ parameters:
                   },
                   "ArnEquals": {
                       "aws:PrincipalArn": [
-                          "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"
+                          "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"                    ]
                   }
               }
           },
-        {
-          "Effect": "Allow",
-          "Principal": {
-              "Service": "ssm.amazonaws.com"
-          },
-          "Action": [
-            "s3:Get*",
-            "s3:List*",
-            "s3:PutObject*"
-          ],
-          "Resource": [
-            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage/ssmLogs",
-            "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-forensic-storage/ssmLogs/*"
-          ],
-          "Condition": {
-              "StringEquals": {
-              "aws:PrincipalOrgID": "o-nkgi7akmvi",
-              "aws:SourceAccount": "{{forensAccountId}}"
-            }
-          }
-        },
       {
               "Effect": "Deny",
               "Principal": {
