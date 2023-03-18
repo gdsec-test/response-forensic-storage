@@ -1,5 +1,0 @@
-template_path: stub.yaml
-dependencies:
-  - "{{environment}}/{{region}}/s3-threat.yaml"
-stack_name: "{{project_code}}-sns-slack-notify"
-obsolete: True
