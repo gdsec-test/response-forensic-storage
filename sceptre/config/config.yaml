@@ -1,4 +1,6 @@
-environment: dev
-accountId: 539225272086
-forensAccountId: 883229650331
-threatId: 786677461057
+project_code: ForensicStorage
+DevelopmentTeam: respstorag  # aws ssm get-parameter "/AdminParams/Team/Name" --query "Parameter.Value" --output text
+# merge variables from --var-file
+environment: "{{ var.environment }}"  # aws ssm get-parameter "/AdminParams/Team/Environment" --query "Parameter.Value" --output text
+account_id:  "{{ var.account_id }}"  # aws sts get-caller-identity --query "Account" --output text
+analysis_account_id: "{{ var.analysis_account_id }}"
