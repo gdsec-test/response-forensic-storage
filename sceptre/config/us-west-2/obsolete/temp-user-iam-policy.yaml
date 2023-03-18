@@ -1,0 +1,1 @@
+stack_name: "{{project_code}}-{{environment}}-{{region}}-temp-user-iam-policy"

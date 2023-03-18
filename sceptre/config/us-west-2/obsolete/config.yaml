@@ -1,0 +1,9 @@
+# All files placed in this folder MUST have a stack_name defined.
+# All other necessary configuration options are defined in this file.
+# The most important one is `obsolete: True`. This tells Sceptre to remove the relevant stacks when the --prune option is used.
+# Unless there is a very good reason to do otherwise, only the stack_name attribute should be defined in each file.
+# The default template (stub.yaml) should be used so that the template file may be removed, if no other stacks depend on it.
+template:
+  type: file
+  path: stub.yaml
+obsolete: True
