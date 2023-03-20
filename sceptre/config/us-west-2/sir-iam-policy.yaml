@@ -1,6 +1,8 @@
-template_path: iam-policy.yaml
+template:
+  type: file
+  path: iam-policy.yaml
 dependencies:
-  - {{environment}}/eu-west-1/s3.yaml
+  - eu-west-1/s3.yaml
 parameters:
   PolicyNameSuffix: "sir-iam-policy"
   PolicyJSON: |
@@ -8,7 +10,6 @@ parameters:
       "Version": "2012-10-17",
       "Statement": [
           {
-              "Sid": "VisualEditor0",
               "Effect": "Allow",
               "Action": [
                   "s3:GetObject",
@@ -22,7 +23,6 @@ parameters:
               ]
           },
           {
-              "Sid": "VisualEditor1",
               "Effect": "Allow",
               "Action": [
                   "s3:ListAllMyBuckets",

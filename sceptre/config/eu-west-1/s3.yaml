@@ -1,6 +1,8 @@
-template_path: s3.yaml
+template:
+  type: file
+  path: s3.yaml
 dependencies:
-  - {{environment}}/eu-west-2/s3-replication.yaml
+  - eu-west-2/s3-replication.yaml
 parameters:
   ServiceCatalogVersion: 1.13.1
   BucketNameSuffix: {{BucketNameSuffix}}
@@ -20,7 +22,7 @@ parameters:
             {
                 "Effect": "Allow",
                 "Principal": {
-                    "AWS": "arn:aws:iam::{{accountId}}:root"
+                    "AWS": "arn:aws:iam::{{account_id}}:root"
                 },
                 "Action": "s3:*",
                 "Resource": [
@@ -45,7 +47,7 @@ parameters:
                 "Condition": {
                     "StringEquals": {
                         "aws:PrincipalOrgID": "o-nkgi7akmvi",
-                        "aws:SourceAccount": "{{forensAccountId}}"
+                        "aws:SourceAccount": "{{analysis_account_id}}"
                     }
                 }
             },
@@ -87,7 +89,7 @@ parameters:
                     },
                     "ArnEquals": {
                         "aws:PrincipalArn": [
-                            "arn:aws:iam::{{accountId}}:role/GD-AWS-USA-GD-RespStorag-Ops"
+                            "arn:aws:iam::{{account_id}}:role/GD-AWS-USA-GD-RespStorag-Ops"
                         ]
                     }
                 }
