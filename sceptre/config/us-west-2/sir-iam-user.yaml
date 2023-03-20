@@ -1,6 +1,8 @@
-template_path: iam-user.yaml
+template:
+  type: file
+  path: iam-user.yaml
 dependencies:
-  - {{environment}}/{{region}}/sir-iam-policy.yaml
+  - "{{region}}/sir-iam-policy.yaml"
 parameters:
   UserName: "GD-user-sir"
   PolicyName: "CustomPolicy"

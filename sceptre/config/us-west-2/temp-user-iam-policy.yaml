@@ -1,6 +1,8 @@
-template_path: iam-policy.yaml
+template:
+  type: file
+  path: iam-policy.yaml
 dependencies:
-  - {{environment}}/eu-west-1/s3.yaml
+  - eu-west-1/s3.yaml
 parameters:
   PolicyNameSuffix: "temp-user-iam-policy"
   PolicyJSON: |

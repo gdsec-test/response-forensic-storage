@@ -1,4 +1,6 @@
-template_path: dataLakeLocalDataAdmins.yaml
+template:
+  type: file
+  path: dataLakeLocalDataAdmins.yaml
 parameters:
   DataLakeAdminRoles:  >-
     [ "GD-AWS-USA-GD-RespStorag-Ops" ]

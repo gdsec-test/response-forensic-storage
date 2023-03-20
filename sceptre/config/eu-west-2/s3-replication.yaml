@@ -1,4 +1,6 @@
-template_path: s3.yaml
+template:
+  type: file
+  path: s3.yaml
 parameters:
   ServiceCatalogVersion: 1.13.1
   BucketNameSuffix: {{BucketNameSuffix}}
@@ -16,7 +18,7 @@ parameters:
             {
                 "Effect": "Allow",
                 "Principal": {
-                    "AWS": "arn:aws:iam::{{accountId}}:root"
+                    "AWS": "arn:aws:iam::{{account_id}}:root"
                 },
                 "Action": "s3:*",
                 "Resource": [
@@ -62,7 +64,7 @@ parameters:
                     },
                     "ArnEquals": {
                         "aws:PrincipalArn": [
-                            "arn:aws:iam::{{accountId}}:role/GD-AWS-USA-GD-RespStorag-Ops"
+                            "arn:aws:iam::{{account_id}}:role/GD-AWS-USA-GD-RespStorag-Ops"
                         ]
                     }
                 }
