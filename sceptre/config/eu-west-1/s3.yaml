@@ -15,85 +15,86 @@ parameters:
     [{"name": "gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}-replica"}]
   CustomBucketPolicyJSON: |
     {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-              "Effect": "Allow",
-              "Principal": {
-                  "AWS": "arn:aws:iam::{{accountId}}:root"
-              },
-              "Action": "s3:*",
-              "Resource": [
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-              ]
-          },
-          {
-              "Effect": "Allow",
-              "Principal": {
-                  "Service": "ssm.amazonaws.com"
-          },
-              "Action": [
-                  "s3:Get*",
-                  "s3:List*",
-                  "s3:PutObject*"
-              ],
-              "Resource": [
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs",
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs/*"
-              ],
-              "Condition": {
-                  "StringEquals": {
-                  "aws:PrincipalOrgID": "o-nkgi7akmvi",
-                  "aws:SourceAccount": "{{forensAccountId}}"
-                  }
-              }
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::{{accountId}}:root"
+                },
+                "Action": "s3:*",
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+                ]
             },
-          {
-              "Effect": "Allow",
-              "Principal": {
-                  "AWS": "*"
-              },
-              "Action": [
-                  "s3:Get*",
-                  "s3:List*"
-              ],
-              "Resource": [
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-              ],
-              "Condition": {
-                  "StringEquals": {
-                      "aws:PrincipalOrgID": "o-nkgi7akmvi"
-                  },
-                  "ArnEquals": {
-                      "aws:PrincipalArn": [
-                          "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"                    ]
-                  }
-              }
-          },
-      {
-              "Effect": "Deny",
-              "Principal": {
-                  "AWS": "*"
-              },
-              "Action": [
-                  "s3:Delete*"
-              ],
-              "Resource": [
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                  "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-              ],
-              "Condition": {
-                  "StringEquals": {
-                      "aws:PrincipalOrgID": "o-nkgi7akmvi"
-                  },
-                  "ArnEquals": {
-                      "aws:PrincipalArn": [
-                          "arn:aws:iam::{{accountId}}:role/GD-AWS-USA-GD-RespStorag-Ops"
-                      ]
-                  }
-              }
-          }
-      ]
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ssm.amazonaws.com"
+                },
+                "Action": [
+                    "s3:Get*",
+                    "s3:List*",
+                    "s3:PutObject*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs",
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs/*"
+                ],
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-nkgi7akmvi",
+                        "aws:SourceAccount": "{{forensAccountId}}"
+                    }
+                }
+            },
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": [
+                    "s3:Get*",
+                    "s3:List*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+                ],
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-nkgi7akmvi"
+                    },
+                    "ArnEquals": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"
+                        ]
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": [
+                    "s3:Delete*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+                ],
+                "Condition": {
+                    "StringEquals": {
+                        "aws:PrincipalOrgID": "o-nkgi7akmvi"
+                    },
+                    "ArnEquals": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::{{accountId}}:role/GD-AWS-USA-GD-RespStorag-Ops"
+                        ]
+                    }
+                }
+            }
+        ]
     }
