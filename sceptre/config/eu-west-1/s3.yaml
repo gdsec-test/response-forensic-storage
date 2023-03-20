@@ -52,7 +52,7 @@ parameters:
             {
                 "Effect": "Allow",
                 "Principal": {
-                    "AWS": "*"
+                    "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
                 },
                 "Action": [
                     "s3:Get*",
@@ -64,12 +64,8 @@ parameters:
                 ],
                 "Condition": {
                     "StringEquals": {
-                        "aws:PrincipalOrgID": "o-nkgi7akmvi"
-                    },
-                    "ArnEquals": {
-                        "aws:PrincipalArn": [
-                            "arn:aws:iam::{{forensAccountId}}:role/respforens-custom-iam-ec2-role"
-                        ]
+                        "aws:PrincipalOrgID": "o-nkgi7akmvi",
+                        "aws:PrincipalTag/IncidentResponse": "ForensicAnalysis"
                     }
                 }
             },
