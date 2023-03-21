@@ -2,9 +2,9 @@ name: cirrus-scan
 
 on:
   push:
-    branches: [ develop ] 
+    branches: [ develop ]
   schedule:
-    - cron: '59 23 1 1/3 *'  
+    - cron: '59 23 1 1/3 *'
 jobs:
   cirrus-scan-dev:
     runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
