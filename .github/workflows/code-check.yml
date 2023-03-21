@@ -6,7 +6,7 @@ on:
       - main
       - develop
   workflow_dispatch:
-    
+
 jobs:
   tartufo:
     runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
