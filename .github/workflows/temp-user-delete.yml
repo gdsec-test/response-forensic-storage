@@ -1,100 +1,25 @@
 name: Delete Temp Users
 
-# Deletes the IAM User "temp-user" from the AWS PROD environment using sceptre.
+# Deletes the temporyary IAM User from all AWS environments
 # This workflow runs on a self-hosted runner
 
 on:
   schedule:
     - cron: '59 23 * * *'
 jobs:
-  delete_temp_user_prod:
-    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
-        with:
-          aws-region: us-west-2
-          role-to-assume: arn:aws:iam::710249649903:role/GD-AWS-USA-GD-RespStorag-Prod-Deploy
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Run sceptre
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U sceptre
-          cd sceptre
-          sceptre delete -y prod/us-west-2/temp-user-iam-user.yaml
-
-  delete_temp_user_dev_private:
-    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
-        with:
-          aws-region: us-west-2
-          role-to-assume: arn:aws:iam::763338924548:role/GD-AWS-USA-GD-RespStorag-Dev-Private-Deploy
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Run sceptre
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U sceptre
-          cd sceptre
-          sceptre delete -y dev-private/us-west-2/temp-user-iam-user.yaml
-
-  delete_temp_user_dev:
-    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
-        with:
-          aws-region: us-west-2
-          role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Dev-Deploy
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Run sceptre
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U sceptre
-          cd sceptre
-          sceptre delete -y dev/us-west-2/temp-user-iam-user.yaml
-
-  delete_temp_user_test:
-    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
-        with:
-          aws-region: us-west-2
-          role-to-assume: arn:aws:iam::745293682974:role/GD-AWS-USA-GD-RespStorag-Test-Deploy
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Run sceptre
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U sceptre
-          cd sceptre
-          sceptre delete -y test/us-west-2/temp-user-iam-user.yaml
+  delete_temp_user:
+    uses: ./.github/workflows/temp-user.yaml
+    strategy:
+      fail-fast: false
+      matrix:
+        aws_environment:
+          - dev-private
+          - dev
+          - test
+          - prod
+    with:
+      aws_environment: ${{ matrix.aws_environment }}
+      sceptre_action: delete
+      u_accept: accept
+    secrets:
+      DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}

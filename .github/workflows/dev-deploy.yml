@@ -10,26 +10,8 @@ on:
 
 jobs:
   deploy_to_dev:
-    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef
-        with:
-          aws-region: us-west-2
-          role-to-assume: arn:aws:iam::539225272086:role/GD-AWS-USA-GD-RespStorag-Dev-Deploy
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Run sceptre
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install -U pip
-          pip install -U sceptre
-          cd sceptre
-          sceptre launch -y dev/eu-west-1/s3.yaml
-          sceptre launch -y dev/us-west-2/sir-iam-user.yaml
+    uses: ./.github/workflows/deploy-resources.yaml
+    with:
+      aws_environment: dev
+    secrets:
+      DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}

@@ -1,0 +1,71 @@
+name: Deploy Resources
+
+# Deploys the ResponseStorage resources to the specified AWS environment using sceptre.
+# This workflow runs on a self-hosted runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      aws_environment:
+        description: AWS Environment
+        type: choice
+        required: true
+        options:
+          - dev-private
+          - dev
+          - test
+          - prod
+      u_accept:
+        description: Enter "accept" if running in prod. Not checked otherwise
+        type: string
+        required: false
+  workflow_call:
+    inputs:
+      aws_environment:
+        type: string
+        required: true
+      u_accept:
+        type: string
+        required: false
+    secrets:
+      DEPLOY_ROLE_ARN:
+        required: true
+
+env:
+  AWS_ENVIRONMENT: "${{ inputs.aws_environment }}"
+
+jobs:
+  deploy:
+    runs-on: [self-hosted,incident-response,response-forensic-storage,deploy]
+    environment: "${{ inputs.aws_environment }}"
+    steps:
+      - name: Checks for running in production
+        if: ${{ inputs.aws_environment == 'prod' }}
+        env:
+          GITHUB_REF: ${{ github.ref }}
+          U_ACCEPT: ${{ inputs.u_accept }}
+        run: |
+          if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]
+          then
+            echo "::error:: Can only deploy the main branch to production" > /dev/stderr
+            exit 1
+          elif [[ "${U_ACCEPT}ed" != "accepted" ]]
+          then
+            echo "::error:: Did not enter 'accept' into u_accept" > /dev/stderr
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
+        with:
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Run sceptre
+        run: |
+          make launch-all
