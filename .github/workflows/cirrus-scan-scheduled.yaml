@@ -1,0 +1,28 @@
+name: Scheduled CirrusScan
+on:
+  schedule:
+    # run once every 2 months (guaranteed to be at least once every 90 days)
+    - cron: "59 23 1 */2 *"
+  workflow_dispatch:
+
+jobs:
+  scheduled_cirrus_scan:
+    name: Run CirrusScan
+    uses: ./.github/workflows/cirrus-scan.yaml
+    strategy:
+      fail-fast: false
+      matrix:
+        aws_environment:
+          - dev-private
+          - dev
+          - test
+          - prod
+        aws_region:
+          - us-west-2
+    with:
+      aws_environment: ${{ matrix.aws_environment }}
+      aws_region: ${{ matrix.aws_region }}
+      u_accept: accept
+    secrets:
+      DEPLOY_ROLE_ARN: ${{ secrets.DEPLOY_ROLE_ARN }}
+      AUDIT_ACCOUNT_ID: ${{ secrets.AUDIT_ACCOUNT_ID }}

@@ -8,11 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  tartufo:
-    runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
+  code-quality:
+    runs-on: [self-hosted,incident-response,response-forensic-storage,utility]
     steps:
-      - name: Checkout GoDaddy Actions repo # Checkout shared actions repository gd-actions
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - name: Checkout repository
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v3.5.2
 
-      - name: Run Tartufo
-        uses: godaddy/tartufo-action@d95293febe8f40a6b8ee3ac0acebfc36c3b7e0d1
+      - name: Run code quality checks (Tartufo, pre-commit, etc.)
+        run: make code-quality

@@ -1,0 +1,103 @@
+name: CirrusScan
+on:
+  workflow_dispatch:
+    inputs:
+      aws_environment:
+        description: AWS Environment
+        required: true
+        type: choice
+        options:
+          - dev-private
+          - dev
+          - test
+          - prod
+        default: dev-private
+      aws_region:
+        description: AWS Region
+        required: true
+        type: choice
+        options:
+          - us-west-2
+          - eu-west-1
+        default: us-west-2
+      u_accept:
+        description: Enter "accept" if running in prod; not checked otherwise
+        required: false
+  workflow_call:
+    inputs:
+      aws_environment:
+        required: true
+        type: string
+      aws_region:
+        required: true
+        type: string
+      u_accept:
+        required: true
+        type: string
+    secrets:
+      DEPLOY_ROLE_ARN:
+        required: true
+      AUDIT_ACCOUNT_ID:
+        required: true
+
+jobs:
+  cirrus_scan:
+    environment: ${{ inputs.aws_environment }}
+    runs-on: [self-hosted, incident-response, response-forensic-storage, deploy]
+    outputs:
+      scan_result: ${{ steps.run_cirrus_scan.outcome }}
+    steps:
+      - name: Check u_accept for running in prod
+        env:
+          U_ACCEPT: "${{ inputs.u_accept }}"
+        if: "${{ inputs.aws_environment == 'prod' }}"
+        run: |
+          [[ "${U_ACCEPT}ed" == "accepted" ]]
+
+      - name: Switch to LoB Account Deploy Role
+        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
+        with:
+          aws-region: ${{ inputs.aws_region }}
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          role-skip-session-tagging: true
+          role-duration-seconds: 7200
+
+      # See https://github.com/gdcorp-appservices/cirrus-scan-cicd for AUDIT_ACCOUNT_ID
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@261a7de32bda11ba01f4d75c4ed6caf3739e54be # v1.5.3
+        with:
+          registries: ${{ secrets.AUDIT_ACCOUNT_ID }}
+
+      - name: Pull latest CirrusScan container image
+        run: |
+          docker pull ${{ secrets.AUDIT_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/cirrus-scan-cicd:latest
+
+      - name: Run CirrusScan
+        id: run_cirrus_scan
+        env:
+          AWS_ENVIRONMENT: "${{ inputs.aws_environment }}"
+          AWS_REGION: "${{ inputs.aws_region }}"
+          GITHUB_REPO: "${{ github.repository }}"
+          GITHUB_COMMIT: "${{ github.sha }}"
+        run: |
+          CIRRUS_SCAN_TASK_LIST='["vulnscan"]'
+          if [[ "${AWS_ENVIRONMENT}" != "prod" ]]
+          then
+            CIRRUS_SCAN_TASK_LIST='["vulnscan","zaproxy"]'
+          fi
+
+          docker run \
+            --rm \
+            --name=cirrus-scan \
+            --env "TASK_LIST=${CIRRUS_SCAN_TASK_LIST}" \
+            --env "AWS_DEFAULT_REGION=${AWS_REGION}" \
+            --env "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" \
+            --env "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" \
+            --env "AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}" \
+            --env "GITHUB_AUTH=${{ secrets.GITHUB_TOKEN }}" \
+            --env 'GITHUB_URL=https://github.com/' \
+            --env "GITHUB_REPO=${GITHUB_REPOSITORY}" \
+            --env "GITHUB_COMMIT=${GITHUB_COMMIT}" \
+            --env FASTFAIL=1 \
+            --env WAIT=7200 \
+            ${{ secrets.AUDIT_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/cirrus-scan-cicd:latest
