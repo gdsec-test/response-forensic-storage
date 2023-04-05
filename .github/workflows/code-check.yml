@@ -15,4 +15,4 @@ jobs:
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
 
       - name: Run Tartufo
-        uses: godaddy/tartufo-action@c8607e0e526850e5c5f0608459288b40f50fddbc
+        uses: godaddy/tartufo-action@d95293febe8f40a6b8ee3ac0acebfc36c3b7e0d1
