@@ -1,0 +1,12 @@
+template_path: s3-athena.yaml
+dependencies:
+  - {{environment}}/us-west-2/dataLakeLinkedDatabase.yaml
+parameters:
+  BucketNameSuffix: athena-results
+  BucketPolicy: Private
+  VersioningStatus: "Enabled"
+  ExpirationDays: "30"
+  OldVersionExpirationDays: "30"
+  EnableBucketMetrics: "true"
+  BucketOwnerPreferred: "true"
+  ServiceCatalogVersion: 1.20.0

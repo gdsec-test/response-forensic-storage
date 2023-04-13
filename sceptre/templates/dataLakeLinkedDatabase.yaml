@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates a local Glue database linked to a database in the GoDaddy Data Lake.
+Parameters:
+  DataLakeDatabaseName:
+    Type: String
+    Description: The name of the database in the GoDaddy Data Lake to link to.
+  LocalDatabaseName:
+    Type: String
+    Description: (optional) The name of the local database linked to the supplied Data Lake database.
+    Default: ""
+  DataLakeCatalog:
+    Type: String
+    Description: The environment of the Godaddy Data Lake catalog to link to.
+    Default: prod
+    AllowedValues:
+      - prod
+  Description:
+    Type: String
+    Description: (optional) A human friendly description of this linked database.
+    Default: ""
+  ProductVersion:
+    Type: String
+    Description: (optional) The Service Catalog product version to deploy.
+    Default: "1.1.0"
+Resources:
+  LinkedGlueDatabase:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: DataLakeLinkedDatabase
+      ProvisioningArtifactName: !Ref ProductVersion
+      ProvisionedProductName: !Sub "lake-linked-db-${DataLakeDatabaseName}"
+      ProvisioningParameters:
+        - Key: DataLakeDatabaseName
+          Value: !Ref DataLakeDatabaseName
+        - Key: LocalDatabaseName
+          Value: !Ref LocalDatabaseName
+        - Key: DataLakeCatalog
+          Value: !Ref DataLakeCatalog
+        - Key: Description
+          Value: !Ref Description
+      Tags:
+        - Key: doNotShutDown
+          Value: true
+Outputs:
+  DatabaseName:
+    Description: The name of created data lake linked Glue database.
+    Value: !GetAtt [LinkedGlueDatabase, Outputs.DatabaseName]
