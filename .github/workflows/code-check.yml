@@ -12,7 +12,7 @@ jobs:
     runs-on: [self-hosted,ir-forensic-storage-runners,ir-forensic,ir-forensic-storage]
     steps:
       - name: Checkout GoDaddy Actions repo # Checkout shared actions repository gd-actions
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
 
       - name: Run Tartufo
         uses: godaddy/tartufo-action@d95293febe8f40a6b8ee3ac0acebfc36c3b7e0d1
