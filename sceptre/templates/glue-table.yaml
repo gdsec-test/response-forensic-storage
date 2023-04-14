@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create a Glue table using provided variables.
+Parameters:
+  Owner:
+    Type: String
+    Description: Name of the Owner
+  TableType:
+    Type: String
+    Description: The type of the table
+    AllowedValues:
+      - EXTERNAL_TABLE
+      - VIRTUAL_VIEW
+    Default: "EXTERNAL_TABLE"
+  InputFormat:
+    Type: String
+    Description: The input format SequenceFileInputFormat (binary), TextInputFormat, or a custom format.
+  OutputFormat:
+    Type: String
+    Description: The output format SequenceFileOutputFormat (binary), IgnoreKeyTextOutputFormat, or a custom format.
+  GlueTableColumnTypes:
+    Type: String
+    Description: A comma delimited list of column types. (Eg. string,bigint,int etc)
+  GlueTableColumnNames:
+    Type: String
+    Description: A comma delimited list of column names. (Eg. column1,column2,column3 etc)
+  GlueTableColumnComments:
+    Type: String
+    Description: (optional) A comma delimited list of column comments. Commas must be specified as _comma_ instead of using actual commas. (Eg. 'columncomment1','columncomment2','columncomment3' etc)
+  SerializationLibrary:
+    Type: String
+    Description: The serialization library
+  BucketNameSuffix:
+    Type: String
+    MinLength: 1
+    Description: The bucket name suffix of the bucket containing the table
+  TableName:
+    Type: String
+    Description: The name of the Glue Table.
+  DatabaseName:
+    Type: String
+    Description: The name of the Database
+  NumberOfColumns:
+    Type: String
+    Description: Total Number of columns in the table. Should be equal to list size of GlueTableColumnNames, GlueTableColumnTypes and GlueTableColumnComments
+  SerdeName:
+    Type: String
+    Description: (optional) The name of the SerDe
+    Default: ""
+  SerializationLibrary:
+    Type: String
+    Description: The serialization library
+  SerdeParametersJson:
+    Type: String
+    Description: (optional) Json value of the Serde parameters
+    Default: "{}"
+  StorageDescriptorParametersJson:
+    Type: String
+    Description: (optional) Json value of the Storage descriptor parameters.
+    Default: "{}"
+  DevelopmentTeam:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for team owning the created resources.
+    Default: /AdminParams/Team/Name
+    AllowedValues:
+      - /AdminParams/Team/Name
+  DevelopmentEnvironment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter for development environment this will live in.
+    Default: /AdminParams/Team/Environment
+    AllowedValues:
+      - /AdminParams/Team/Environment
+Resources:
+  GlueTable:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: GlueTable
+      ProvisioningArtifactName: 2.0.0
+      ProvisionedProductName: !Join [ ".", [ !Ref DatabaseName, !Ref TableName ] ]
+      ProvisioningParameters:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: TableType
+          Value: !Ref TableType
+        - Key: InputFormat
+          Value: !Ref InputFormat
+        - Key: OutputFormat
+          Value: !Ref OutputFormat
+        - Key: GlueTableColumnTypes
+          Value: !Ref GlueTableColumnTypes
+        - Key: GlueTableColumnNames
+          Value: !Ref GlueTableColumnNames
+        - Key: GlueTableColumnComments
+          Value: !Ref GlueTableColumnComments
+        - Key: SerializationLibrary
+          Value: !Ref SerializationLibrary
+        - Key: StorageLocation
+          Value: !Sub s3://gd-${DevelopmentTeam}-${DevelopmentEnvironment}-${BucketNameSuffix}
+        - Key: TableName
+          Value: !Ref TableName
+        - Key: DatabaseName
+          Value: !Ref DatabaseName
+        - Key: NumberOfColumns
+          Value: !Ref NumberOfColumns
+        - Key: SerdeName
+          Value: !Ref SerdeName
+        - Key: SerdeParametersJson
+          Value: !Ref SerdeParametersJson
+        - Key: StorageDescriptorParametersJson
+          Value: !Ref StorageDescriptorParametersJson
+      Tags:
+        - Key: doNotShutDown
+          Value: true

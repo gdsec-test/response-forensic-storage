@@ -37,6 +37,4 @@ jobs:
           cd sceptre
           sceptre launch -y prod/eu-west-1/s3.yaml
           sceptre launch -y prod/us-west-2/sir-iam-user.yaml
-          sceptre launch -y prod/us-west-2/threat-response-iam-user.yaml
           sceptre launch -y prod/us-west-2/dataLakeLocalDataAdmins.yaml
-          sceptre launch -y prod/us-west-2/threat-CloudWatchAlarm.yaml

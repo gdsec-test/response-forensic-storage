@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create a Glue Database via SC
+Parameters:
+  DatabaseName:
+    Type: String
+    Description: Name of the database
+Resources:
+  GlueDatabase:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: GlueDatabase
+      ProvisioningArtifactName: 1.1.1
+      ProvisionedProductName: !Sub glue-${DatabaseName}-db
+      ProvisioningParameters:
+        - Key: DatabaseName
+          Value: !Ref DatabaseName
+      Tags:
+        - Key: doNotShutDown
+          Value: true

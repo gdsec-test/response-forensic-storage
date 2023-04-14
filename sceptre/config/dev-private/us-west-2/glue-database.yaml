@@ -1,0 +1,5 @@
+template_path: glue-database.yaml
+dependencies:
+  - {{environment}}/us-west-2/s3-athena.yaml
+parameters:
+  DatabaseName: shopperid-to-customerid

@@ -1,0 +1,24 @@
+template_path: glue-table.yaml
+dependencies:
+  - {{environment}}/us-west-2/glue-database.yaml
+parameters:
+  TableType: EXTERNAL_TABLE
+  Owner: "{{accountId}}"
+  DatabaseName: shopperid-to-customerid
+  TableName: shopperids
+  BucketNameSuffix: athena/idsToLookup
+  InputFormat: org.apache.hadoop.mapred.TextInputFormat
+  OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
+  SerializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+  NumberOfColumns: "1"
+  GlueTableColumnNames: ids
+  GlueTableColumnTypes: string
+  GlueTableColumnComments: shopperIDsToTranslateToCustomerIDs
+  SerdeName: ParquetHiveSerDe
+  SerdeParametersJson: '{"serialization.format": "1","field.delim": ","}'
+  StorageDescriptorParametersJson: >-
+    {
+      "compressionType": "none",
+      "classification": "csv",
+      "typeOfData": "file"
+    }
