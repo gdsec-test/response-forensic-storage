@@ -26,3 +26,8 @@ Resources:
         - Key: doNotShutDown
           # change to false if it can be turned off outside of business hours
           Value: "true"
+
+Outputs:
+  PolicyNameSuffix:
+    Description: Passthrough for the variable of the same name
+    Value: !Ref PolicyNameSuffix
