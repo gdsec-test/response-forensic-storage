@@ -1,4 +1,0 @@
-template_path: dataLakeLinkedDatabase.yaml
-parameters:
-  DataLakeDatabaseName: customers
-  LocalDatabaseName: customer-id-mapping

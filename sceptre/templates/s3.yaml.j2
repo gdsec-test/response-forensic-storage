@@ -1,12 +1,16 @@
 {# This block sets some variables in order to reduce duplicated blocks between CloudFormation Templates #}
 {%- if sceptre_user_data.is_replication_target is defined and sceptre_user_data.is_replication_target -%}
-{%- set is_replication_target = true -%}
-{%- set resource_name = "ReplicationS3Bucket" -%}
-{%- set provisioned_product_name = "replication-response-storage-bucket" -%}
+  {%- set is_replication_target = true -%}
+  {%- set resource_name = "ReplicationS3Bucket" -%}
+  {%- set provisioned_product_name = "replication-response-storage-bucket" -%}
 {%- else -%}
-{%- set is_replication_target = false -%}
-{%- set resource_name = "S3Bucket" -%}
-{%- set provisioned_product_name = "response-storage-bucket" -%}
+  {%- set is_replication_target = false -%}
+  {%- set resource_name = "S3Bucket" -%}
+  {%- if sceptre_user_data.provisioned_product_name is defined -%}
+    {%- set provisioned_product_name = sceptre_user_data.provisioned_product_name -%}
+  {%- else -%}
+    {%- set provisioned_product_name = "response-storage-bucket" -%}
+  {%- endif -%}
 {%- endif -%}
 
 AWSTemplateFormatVersion: 2010-09-09

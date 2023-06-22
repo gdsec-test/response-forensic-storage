@@ -1,10 +1,13 @@
-template_path: glue-table.yaml
+template:
+  type: file
+  path: glue-table.yaml
+stack_name: "{{ project_code }}-{{ component_name }}-{{ app_name }}-table"
 dependencies:
-  - {{environment}}/us-west-2/glue-database.yaml
+  - "{{ region }}/glue/{{ app_name }}/database.yaml"
 parameters:
   TableType: EXTERNAL_TABLE
-  Owner: "{{accountId}}"
-  DatabaseName: shopperid-to-customerid
+  Owner: "{{ account_id }}"
+  DatabaseName: "{{ app_name }}"
   TableName: shopperids
   BucketNameSuffix: athena/idsToLookup
   InputFormat: org.apache.hadoop.mapred.TextInputFormat

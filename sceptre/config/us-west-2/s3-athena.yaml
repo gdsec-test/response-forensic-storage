@@ -1,6 +1,6 @@
-template_path: s3-athena.yaml
-dependencies:
-  - {{environment}}/us-west-2/dataLakeLinkedDatabase.yaml
+template:
+  type: file
+  path: s3.yaml.j2
 parameters:
   BucketNameSuffix: athena
   BucketPolicy: Private
@@ -9,4 +9,6 @@ parameters:
   OldVersionExpirationDays: "1"
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
-  ServiceCatalogVersion: 1.20.0
+sceptre_user_data:
+  is_replication_target: false
+  provisioned_product_name: response-athena-bucket
