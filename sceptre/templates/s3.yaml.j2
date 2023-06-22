@@ -1,10 +1,18 @@
+{# This block sets some variables in order to reduce duplicated blocks between CloudFormation Templates #}
+{%- if sceptre_user_data.is_replication_target is defined and sceptre_user_data.is_replication_target -%}
+{%- set is_replication_target = true -%}
+{%- set resource_name = "ReplicationS3Bucket" -%}
+{%- set provisioned_product_name = "replication-response-storage-bucket" -%}
+{%- else -%}
+{%- set is_replication_target = false -%}
+{%- set resource_name = "S3Bucket" -%}
+{%- set provisioned_product_name = "response-storage-bucket" -%}
+{%- endif -%}
+
 AWSTemplateFormatVersion: 2010-09-09
 Description: Bucket where incident evidence will be stored
 
 Parameters:
-  ServiceCatalogVersion:
-    Type: String
-    Description: Service Catalog version for S3
   BucketNameSuffix:
     Type: String
     MinLength: 1
@@ -57,22 +65,24 @@ Parameters:
     AllowedValues:
       - true
       - false
+  {% if not is_replication_target -%}
   ReplicationBucketsJSON:
     Type: String
     Description: (optional) Array of buckets `[{ name, [account] }]` in JSON format. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
     Default: ""
+  {%- endif %}
   CustomBucketPolicyJSON:
     Type: String
     Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
     Default: ""
 
 Resources:
-  S3Bucket:
+  {{ resource_name -}}:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
     Properties:
       ProductName: S3
-      ProvisioningArtifactName: !Ref ServiceCatalogVersion
-      ProvisionedProductName: !Sub ${BucketNameSuffix}-s3-bucket
+      ProvisioningArtifactName: 2.0.0
+      ProvisionedProductName: {{ provisioned_product_name }}
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix
@@ -90,11 +100,12 @@ Resources:
           Value: !Ref BucketOwnerPreferred
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
+        {% if not is_replication_target -%}
         - Key: ReplicationBucketsJSON
           Value: !Ref ReplicationBucketsJSON
+        {%- endif %}
         - Key: CustomBucketPolicyJSON
           Value: !Ref CustomBucketPolicyJSON
-
       Tags:
         - Key: doNotShutDown
           Value: true
@@ -102,4 +113,4 @@ Resources:
 Outputs:
   BucketName:
     Description: "Name of created S3 Bucket"
-    Value: !Ref S3Bucket
+    Value: !GetAtt {{ resource_name -}}.Outputs.BucketName

@@ -1,11 +1,12 @@
 template:
   type: file
-  path: s3.yaml
+  path: s3.yaml.j2
+# we need to manage a stack created in the past because we must preserve existing S3 buckets
+stack_name: "{{project_code}}-{{environment}}-{{region}}-s3"
 dependencies:
   - eu-west-2/s3-replication.yaml
 parameters:
-  ServiceCatalogVersion: 1.13.1
-  BucketNameSuffix: {{BucketNameSuffix}}
+  BucketNameSuffix: "{{BucketNameSuffix}}"
   BucketPolicy: Private
   VersioningStatus: "Enabled"
   ExpirationDays: "1461"
@@ -13,8 +14,22 @@ parameters:
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
   MoveToStandardIAStorageDays: "180"
-  ReplicationBucketsJSON: |
-    [{"name": "gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}-replica"}]
+  # yes, this is really ugly. but this method should guarantee that if, for whatever reason, the BucketName of the replication bucket changes,
+  # that this variable will always resolve to the correct, updated name.
+  # so far, this is the only way to be able to use the result of a "!stack_output_external" Resolver as only a part of the variable's value.
+  # since the Resolver executes AFTER the Jinja2 template is rendered, it incorrect to attempt to store the value of
+  # replication_destination_bucket_role in a separate variable in config.yaml, and use double brace syntax (such as in {{region}}) to substitute it here.
+  # doing so would result in [{"name":"!StackOutputExternal('ForensicAnalysis-dev-private-eu-west-2-s3-replication::BucketName')"}],
+  # or something similar, resulting in a deployment error of "Invalid bucket name provided"
+  # using this "!sub" resolver prevents any extra braces from being used literally, which is why the open and close formatters are required
+  # Documentation references:
+  # - Resolvers: https://docs.sceptre-project.org/latest/docs/resolvers.html
+  # - Resolution order: https://docs.sceptre-project.org/latest/docs/stack_config.html#resolution-order
+  ReplicationBucketsJSON: !sub
+    - '[{open}"name":"{replication_destination_bucket_name}"{close}]'
+    - open: "{"
+      close: "}"
+      replication_destination_bucket_name: !stack_output_external "{{project_code}}-{{environment}}-eu-west-2-s3-replication::BucketName"
   CustomBucketPolicyJSON: |
     {
         "Version": "2012-10-17",
