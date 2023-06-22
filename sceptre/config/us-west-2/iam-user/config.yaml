@@ -1,0 +1,6 @@
+# list dependencies here because a variable depends on it
+dependencies:
+  - eu-west-1/s3.yaml
+  - eu-west-2/s3-replication.yaml
+storage_bucket_name: !stack_output_external "{{project_code}}-{{environment}}-eu-west-1-s3::BucketName"
+replica_bucket_name: !stack_output_external "{{project_code}}-{{environment}}-eu-west-2-s3-replication::BucketName"

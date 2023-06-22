@@ -1,9 +1,0 @@
-template:
-  type: file
-  path: iam-user.yaml
-dependencies:
-  - "{{region}}/sir-iam-policy.yaml"
-parameters:
-  UserName: "GD-user-sir"
-  PolicyName: "CustomPolicy"
-  CustomPolicySuffix: "sir-iam-policy"
