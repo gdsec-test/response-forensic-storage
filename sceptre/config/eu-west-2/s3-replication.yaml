@@ -1,9 +1,10 @@
 template:
   type: file
-  path: s3.yaml
+  path: s3.yaml.j2
+# we need to manage a stack created in the past because we must preserve existing S3 buckets
+stack_name: "{{project_code}}-{{environment}}-{{region}}-s3-replication"
 parameters:
-  ServiceCatalogVersion: 1.13.1
-  BucketNameSuffix: {{BucketNameSuffix}}
+  BucketNameSuffix: "{{BucketNameSuffix}}"
   BucketPolicy: Private
   VersioningStatus: "Enabled"
   ExpirationDays: "1461"
@@ -71,3 +72,5 @@ parameters:
             }
         ]
     }
+sceptre_user_data:
+  is_replication_target: true
