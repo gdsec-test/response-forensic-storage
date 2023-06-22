@@ -1,0 +1,7 @@
+template:
+  type: file
+  path: data-lake-linked-database.yaml
+stack_name: "{{ project_code }}-{{ component_name }}-customer-id-mapping-linked-database"
+parameters:
+  DataLakeDatabaseName: customers
+  LocalDatabaseName: customer-id-mapping

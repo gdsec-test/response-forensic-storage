@@ -1,6 +1,7 @@
 template:
   type: file
-  path: dataLakeLocalDataAdmins.yaml
+  path: data-lake-local-data-admins.yaml
+stack_name: "{{ project_code }}-{{ component_name }}-local-data-admins"
 parameters:
   DataLakeAdminRoles:  >-
     [ "GD-AWS-USA-GD-RespStorag-Ops" ]

@@ -82,6 +82,9 @@ modify-all-resources:
 	$(MAKE) sceptre AWS_REGION=eu-west-2 SCEPTRE_STACK=s3-replication.yaml
 	$(MAKE) sceptre AWS_REGION=eu-west-1 SCEPTRE_STACK=s3.yaml
 	$(MAKE) sceptre AWS_REGION=us-west-2 SCEPTRE_STACK=iam-user/sir
+	$(MAKE) sceptre AWS_REGION=us-west-2 SCEPTRE_STACK=data-lake
+	$(MAKE) sceptre AWS_REGION=us-west-2 SCEPTRE_STACK=s3-athena.yaml
+	$(MAKE) sceptre AWS_REGION=us-west-2 SCEPTRE_STACK=glue
 
 # Launches all* resources using the modify-all-resources target.
 # If there are any stacks that may be present using old stack names, use the prune function to delete them.

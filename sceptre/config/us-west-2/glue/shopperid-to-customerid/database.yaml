@@ -1,0 +1,8 @@
+template:
+  type: file
+  path: glue-database.yaml
+stack_name: "{{ project_code }}-{{ component_name }}-{{ app_name }}-database"
+dependencies:
+  - "{{ region }}/s3-athena.yaml"
+parameters:
+  DatabaseName: "{{ app_name }}"

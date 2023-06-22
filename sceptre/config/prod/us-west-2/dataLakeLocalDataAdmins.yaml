@@ -1,5 +1,0 @@
-template_path: dataLakeLocalDataAdmins.yaml
-parameters:
-  DataLakeAdminRoles:  >-
-    [ "GD-AWS-USA-GD-RespStorag-Ops" ]
-  GoDaddyLambdaBucket: /AdminParams/Team/GlobalBucket

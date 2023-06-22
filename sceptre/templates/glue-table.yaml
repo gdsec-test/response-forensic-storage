@@ -26,9 +26,6 @@ Parameters:
   GlueTableColumnComments:
     Type: String
     Description: (optional) A comma delimited list of column comments. Commas must be specified as _comma_ instead of using actual commas. (Eg. 'columncomment1','columncomment2','columncomment3' etc)
-  SerializationLibrary:
-    Type: String
-    Description: The serialization library
   BucketNameSuffix:
     Type: String
     MinLength: 1
