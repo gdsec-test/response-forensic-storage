@@ -4,29 +4,31 @@ template:
 stack_name: "{{project_code}}-{{user_name}}-user-iam-policy"
 parameters:
   PolicyNameSuffix: "{{user_name}}-user-iam-policy"
-  PolicyJSON: |
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Action": [
-            "s3:Get*",
-            "s3:List*",
-            "s3:AbortMultipartUpload"
-          ],
-          "Effect": "Allow",
-          "Resource": "*"
-        },
-        {
-          "Action": [
-            "s3:PutObject",
-            "s3:PutObjectAcl"
-          ],
-          "Effect": "Allow",
-          "Resource": [
-            "arn:aws:s3:::{{storage_bucket_name}}",
-            "arn:aws:s3:::{{storage_bucket_name}}/*"
-          ]
-        }
-      ]
-    }
+  PolicyJSON: !sub
+    - |-
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Action": [
+              "s3:Get*",
+              "s3:List*",
+              "s3:AbortMultipartUpload"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          },
+          {
+            "Action": [
+              "s3:PutObject",
+              "s3:PutObjectAcl"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+              "arn:aws:s3:::{storage_bucket_name}",
+              "arn:aws:s3:::{storage_bucket_name}/*"
+            ]
+          }
+        ]
+      }
+    - storage_bucket_name: !stack_output_external "{{ storage_bucket_name_output }}"

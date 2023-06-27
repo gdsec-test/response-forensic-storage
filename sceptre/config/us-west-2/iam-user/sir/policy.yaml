@@ -4,30 +4,33 @@ template:
 stack_name: "{{project_code}}-{{environment}}-{{region}}-{{user_name}}-user-iam-policy"
 parameters:
   PolicyNameSuffix: "{{user_name}}-user-iam-policy"
-  PolicyJSON: |
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "s3:GetObject",
-            "s3:ListBucket"
-          ],
-          "Resource": [
-            "arn:aws:s3:::{{storage_bucket_name}}",
-            "arn:aws:s3:::{{storage_bucket_name}}/*",
-            "arn:aws:s3:::{{replica_bucket_name}}",
-            "arn:aws:s3:::{{replica_bucket_name}}/*"
-          ]
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-            "s3:ListAllMyBuckets",
-            "s3:GetBucketLocation"
-          ],
-          "Resource": "*"
-        }
-      ]
-    }
+  PolicyJSON: !sub
+    - |-
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:GetObject",
+              "s3:ListBucket"
+            ],
+            "Resource": [
+              "arn:aws:s3:::{storage_bucket_name}",
+              "arn:aws:s3:::{storage_bucket_name}/*",
+              "arn:aws:s3:::{replica_bucket_name}",
+              "arn:aws:s3:::{replica_bucket_name}/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:ListAllMyBuckets",
+              "s3:GetBucketLocation"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    - storage_bucket_name: !stack_output_external "{{ storage_bucket_name_output }}"
+      replica_bucket_name: !stack_output_external "{{ replica_bucket_name_output }}"
