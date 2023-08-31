@@ -30,7 +30,7 @@ parameters:
     - open: "{"
       close: "}"
       replication_destination_bucket_name: !stack_output_external "{{project_code}}-{{environment}}-eu-west-2-s3-replication::BucketName"
-  CustomBucketPolicyJSON: |
+  CustomBucketPolicyJSON: >-
     {
         "Version": "2012-10-17",
         "Statement": [
@@ -46,6 +46,46 @@ parameters:
                 ]
             },
             {
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "arn:aws:iam::{{account_id}}:root"
+                },
+                "Action": [
+                    "s3:Delete*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+                ],
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::{{account_id}}:role/GD-AWS-USA-GD-RespStorag-Ops"
+                        ]
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "arn:aws:iam::{{account_id}}:root"
+                },
+                "Action": [
+                    "s3:Delete*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+                ],
+                "Condition": {
+                    "ArnLike": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::{{account_id}}:user/GD-user-*"
+                        ]
+                    }
+                }
+            },
+            {
                 "Effect": "Allow",
                 "Principal": {
                     "Service": "ssm.amazonaws.com"
@@ -53,7 +93,9 @@ parameters:
                 "Action": [
                     "s3:Get*",
                     "s3:List*",
-                    "s3:PutObject*"
+                    "s3:PutObject*",
+                    "s3:CreateMultiPartUpload",
+                    "s3:AbortMultipartUpload"
                 ],
                 "Resource": [
                     "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs",
@@ -61,7 +103,6 @@ parameters:
                 ],
                 "Condition": {
                     "StringEquals": {
-                        "aws:PrincipalOrgID": "o-nkgi7akmvi",
                         "aws:SourceAccount": "{{analysis_account_id}}"
                     }
                 }
@@ -72,8 +113,8 @@ parameters:
                     "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
                 },
                 "Action": [
-                    "s3:Get*",
-                    "s3:List*"
+                    "s3:ListBucket",
+                    "s3:GetObject*"
                 ],
                 "Resource": [
                     "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
@@ -81,31 +122,53 @@ parameters:
                 ],
                 "Condition": {
                     "StringEquals": {
-                        "aws:PrincipalOrgID": "o-nkgi7akmvi",
                         "aws:PrincipalTag/IncidentResponse": "ForensicAnalysis"
                     }
                 }
             },
             {
-                "Effect": "Deny",
+                "Effect": "Allow",
                 "Principal": {
-                    "AWS": "*"
+                    "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
                 },
                 "Action": [
-                    "s3:Delete*"
+                    "s3:ListBucket",
+                    "s3:GetObject*",
+                    "s3:PutObject",
+                    "s3:CreateMultiPartUpload",
+                    "s3:AbortMultipartUpload",
+                    "s3:DeleteObject"
                 ],
                 "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*/_analysis/*"
+                ],
+                "Condition": {
+                    "ArnEquals": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops"
+                        ]
+                    }
+                }
+            },
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
+                },
+                "Action": [
+                    "s3:ListBucket",
+                    "s3:GetObject*",
+                    "s3:PutObject",
+                    "s3:CreateMultiPartUpload",
+                    "s3:AbortMultipartUpload",
+                    "s3:DeleteObject"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*/_analysis/*"
                 ],
                 "Condition": {
                     "StringEquals": {
-                        "aws:PrincipalOrgID": "o-nkgi7akmvi"
-                    },
-                    "ArnEquals": {
-                        "aws:PrincipalArn": [
-                            "arn:aws:iam::{{account_id}}:role/GD-AWS-USA-GD-RespStorag-Ops"
-                        ]
+                        "aws:PrincipalTag/IncidentResponse": "ForensicAnalysis"
                     }
                 }
             }

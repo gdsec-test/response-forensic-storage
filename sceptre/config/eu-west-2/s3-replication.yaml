@@ -28,29 +28,9 @@ parameters:
                 ]
             },
             {
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
-                },
-                "Action": [
-                    "s3:Get*",
-                    "s3:List*"
-                ],
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-                ],
-                "Condition": {
-                    "StringEquals": {
-                        "aws:PrincipalOrgID": "o-nkgi7akmvi",
-                        "aws:PrincipalTag/IncidentResponse": "ForensicAnalysis"
-                    }
-                }
-            },
-            {
                 "Effect": "Deny",
                 "Principal": {
-                    "AWS": "*"
+                    "AWS": "arn:aws:iam::{{account_id}}:root"
                 },
                 "Action": [
                     "s3:Delete*"
@@ -60,12 +40,29 @@ parameters:
                     "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
                 ],
                 "Condition": {
-                    "StringEquals": {
-                        "aws:PrincipalOrgID": "o-nkgi7akmvi"
-                    },
                     "ArnEquals": {
                         "aws:PrincipalArn": [
                             "arn:aws:iam::{{account_id}}:role/GD-AWS-USA-GD-RespStorag-Ops"
+                        ]
+                    }
+                }
+            },
+            {
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "arn:aws:iam::{{account_id}}:root"
+                },
+                "Action": [
+                    "s3:Delete*"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
+                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
+                ],
+                "Condition": {
+                    "ArnLike": {
+                        "aws:PrincipalArn": [
+                            "arn:aws:iam::{{account_id}}:user/*"
                         ]
                     }
                 }
