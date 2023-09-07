@@ -14,6 +14,7 @@
 {%- endif -%}
 
 AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::LanguageExtensions
 Description: Bucket where incident evidence will be stored
 
 Parameters:
@@ -74,11 +75,32 @@ Parameters:
     Type: String
     Description: (optional) Array of buckets `[{ name, [account] }]` in JSON format. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
     Default: ""
+  ReplicationBucket:
+    Type: String
+    Description: (optional) Name of bucket to replicate to. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
+    Default: ""
   {%- endif %}
   CustomBucketPolicyJSON:
     Type: String
     Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
     Default: ""
+  DevelopmentTeam:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /AdminParams/Team/Name
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /AdminParams/Team/Environment
+  OpsRoleARN:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /ServiceCatalog/IAM/OpsRoleARN
+  DeployRoleARN:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /AdminParams/IAM/DeployRoleArn
+
+{% if not is_replication_target -%}
+Conditions:
+  ReplicationBucketProvided: !Not [!Equals [!Ref ReplicationBucket, ""]]
+{%- endif %}
 
 Resources:
   {{ resource_name -}}:
@@ -106,10 +128,17 @@ Resources:
           Value: !Ref MoveToStandardIAStorageDays
         {% if not is_replication_target -%}
         - Key: ReplicationBucketsJSON
-          Value: !Ref ReplicationBucketsJSON
+          Value: !If
+              - ReplicationBucketProvided
+              - Fn::ToJsonString:
+                - name: !Ref ReplicationBucket
+              - !Ref ReplicationBucketsJSON
         {%- endif %}
         - Key: CustomBucketPolicyJSON
-          Value: !Ref CustomBucketPolicyJSON
+          Value:
+            {% if sceptre_user_data.custom_bucket_policy is defined -%}
+            {{- sceptre_user_data.custom_bucket_policy | indent(12) }}
+            {%- else -%} !Ref CustomBucketPolicyJSON {%- endif %}
       Tags:
         - Key: doNotShutDown
           Value: true

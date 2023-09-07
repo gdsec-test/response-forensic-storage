@@ -14,163 +14,109 @@ parameters:
   EnableBucketMetrics: "true"
   BucketOwnerPreferred: "true"
   MoveToStandardIAStorageDays: "180"
-  # yes, this is really ugly. but this method should guarantee that if, for whatever reason, the BucketName of the replication bucket changes,
-  # that this variable will always resolve to the correct, updated name.
-  # so far, this is the only way to be able to use the result of a "!stack_output_external" Resolver as only a part of the variable's value.
-  # since the Resolver executes AFTER the Jinja2 template is rendered, it incorrect to attempt to store the value of
-  # replication_destination_bucket_role in a separate variable in config.yaml, and use double brace syntax (such as in {{region}}) to substitute it here.
-  # doing so would result in [{"name":"!StackOutputExternal('ForensicAnalysis-dev-private-eu-west-2-s3-replication::BucketName')"}],
-  # or something similar, resulting in a deployment error of "Invalid bucket name provided"
-  # using this "!sub" resolver prevents any extra braces from being used literally, which is why the open and close formatters are required
-  # Documentation references:
-  # - Resolvers: https://docs.sceptre-project.org/latest/docs/resolvers.html
-  # - Resolution order: https://docs.sceptre-project.org/latest/docs/stack_config.html#resolution-order
-  ReplicationBucketsJSON: !sub
-    - '[{open}"name":"{replication_destination_bucket_name}"{close}]'
-    - open: "{"
-      close: "}"
-      replication_destination_bucket_name: !stack_output_external "{{project_code}}-{{environment}}-eu-west-2-s3-replication::BucketName"
-  CustomBucketPolicyJSON: >-
-    {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::{{account_id}}:root"
-                },
-                "Action": "s3:*",
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-                ]
-            },
-            {
-                "Effect": "Deny",
-                "Principal": {
-                    "AWS": "arn:aws:iam::{{account_id}}:root"
-                },
-                "Action": [
-                    "s3:Delete*"
-                ],
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-                ],
-                "Condition": {
-                    "ArnEquals": {
-                        "aws:PrincipalArn": [
-                            "arn:aws:iam::{{account_id}}:role/GD-AWS-USA-GD-RespStorag-Ops"
-                        ]
-                    }
-                }
-            },
-            {
-                "Effect": "Deny",
-                "Principal": {
-                    "AWS": "arn:aws:iam::{{account_id}}:root"
-                },
-                "Action": [
-                    "s3:Delete*"
-                ],
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-                ],
-                "Condition": {
-                    "ArnLike": {
-                        "aws:PrincipalArn": [
-                            "arn:aws:iam::{{account_id}}:user/GD-user-*"
-                        ]
-                    }
-                }
-            },
-            {
-                "Effect": "Allow",
-                "Principal": {
-                    "Service": "ssm.amazonaws.com"
-                },
-                "Action": [
-                    "s3:Get*",
-                    "s3:List*",
-                    "s3:PutObject*",
-                    "s3:CreateMultiPartUpload",
-                    "s3:AbortMultipartUpload"
-                ],
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs",
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/ssmLogs/*"
-                ],
-                "Condition": {
-                    "StringEquals": {
-                        "aws:SourceAccount": "{{analysis_account_id}}"
-                    }
-                }
-            },
-            {
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
-                },
-                "Action": [
-                    "s3:ListBucket",
-                    "s3:GetObject*"
-                ],
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}",
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*"
-                ],
-                "Condition": {
-                    "StringEquals": {
-                        "aws:PrincipalTag/IncidentResponse": "ForensicAnalysis"
-                    }
-                }
-            },
-            {
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
-                },
-                "Action": [
-                    "s3:ListBucket",
-                    "s3:GetObject*",
-                    "s3:PutObject",
-                    "s3:CreateMultiPartUpload",
-                    "s3:AbortMultipartUpload",
-                    "s3:DeleteObject"
-                ],
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*/_analysis/*"
-                ],
-                "Condition": {
-                    "ArnEquals": {
-                        "aws:PrincipalArn": [
-                            "arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops"
-                        ]
-                    }
-                }
-            },
-            {
-                "Effect": "Allow",
-                "Principal": {
-                    "AWS": "arn:aws:iam::{{ analysis_account_id }}:root"
-                },
-                "Action": [
-                    "s3:ListBucket",
-                    "s3:GetObject*",
-                    "s3:PutObject",
-                    "s3:CreateMultiPartUpload",
-                    "s3:AbortMultipartUpload",
-                    "s3:DeleteObject"
-                ],
-                "Resource": [
-                    "arn:aws:s3:::gd-{{DevelopmentTeam}}-{{environment}}-{{BucketNameSuffix}}/*/_analysis/*"
-                ],
-                "Condition": {
-                    "StringEquals": {
-                        "aws:PrincipalTag/IncidentResponse": "ForensicAnalysis"
-                    }
-                }
-            }
-        ]
-    }
+  ReplicationBucket: !stack_output_external "{{project_code}}-{{environment}}-eu-west-2-s3-replication::BucketName"
+sceptre_user_data:
+  # to use your IDE's YAML formatter/linter, just comment out the pipe character in the following line
+  # please be sure to restore it before committing your changes
+  # this is a multi-line string, so the pipe character is required
+  # we are using this to put the YAML directly into the Jinja template so that
+  # - we can use both the Jinja2 and CloudFormation template variables
+  # - it is easier to maintain when compared to a JSON blob as a string in a YAML file
+  # - we do not run up against the 4096 character limit of the CustomBucketPolicy parameter (largely due to indentation)
+  custom_bucket_policy: |
+    Fn::ToJsonString:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+          Action: s3:*
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+        - Effect: Deny
+          Principal:
+            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+          Action:
+            - s3:Delete*
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+          Condition:
+            ArnEquals:
+              aws:PrincipalArn:
+                - !Ref OpsRoleARN
+                - !Ref DeployRoleARN
+        - Effect: Deny
+          Principal:
+            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+          Action:
+            - s3:Delete*
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+          Condition:
+            ArnLike:
+              aws:PrincipalArn:
+                - !Sub arn:aws:iam::${AWS::AccountId}:user/GD-user-*
+        - Effect: Allow
+          Principal:
+            Service: ssm.amazonaws.com
+          Action:
+            - s3:Get*
+            - s3:List*
+            - s3:PutObject*
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/ssmLogs
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/ssmLogs/*
+          Condition:
+            StringEquals:
+              aws:SourceAccount: {{ analysis_account_id }}
+        - Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::{{ analysis_account_id }}:root
+          Action:
+            - s3:ListBucket
+            - s3:GetObject*
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+          Condition:
+            StringEquals:
+              aws:PrincipalTag/IncidentResponse: ForensicAnalysis
+        - Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::{{ analysis_account_id }}:root
+          Action:
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_analysis/*
+          Condition:
+            StringEquals:
+              aws:PrincipalTag/IncidentResponse: ForensicAnalysis
+        - Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::{{ analysis_account_id }}:root
+          Action:
+            - s3:ListBucket
+            - s3:GetObject*
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+          Condition:
+            ArnEquals:
+              aws:PrincipalArn:
+                - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops
+        - Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::{{ analysis_account_id }}:root
+          Action:
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource:
+            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_analysis/*
+          Condition:
+            ArnEquals:
+              aws:PrincipalArn:
+                - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops
