@@ -1,0 +1,9 @@
+template:
+  type: file
+  path: iam-user.yaml
+dependencies:
+  - "{{region}}/iam-user/{{user_name}}/policy.yaml"
+stack_name: "{{project_code}}-{{user_name}}-iam-user"
+parameters:
+  UserName: "GD-user-{{user_name}}"
+  CustomPolicySuffix: !stack_output_external "{{project_code}}-{{user_name}}-user-iam-policy::PolicyNameSuffix"

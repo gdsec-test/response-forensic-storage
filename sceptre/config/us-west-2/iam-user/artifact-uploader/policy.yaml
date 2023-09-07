@@ -1,0 +1,39 @@
+template:
+  type: file
+  path: iam-policy.yaml
+stack_name: "{{project_code}}-{{user_name}}-user-iam-policy"
+parameters:
+  PolicyNameSuffix: "{{user_name}}-user-iam-policy"
+  # Our bucket is versioned, we would need the GetObjectVersion and GetObjectVersionAttributes permissions,
+  # which would allow the user to download the object, which is not desirable.
+  # https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObjectAttributes.html
+  # Also, explicitly deny Delete* and GetObject* on all resources so that the user cannot
+  # delete or download/exfiltrate any data in the account (or any other buckets the user may have access to)
+  PolicyJSON: |
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:GetBucketLocation",
+            "s3:ListBucket",
+            "s3:PutObject",
+            "s3:CreateMultipartUpload",
+            "s3:AbortMultipartUpload"
+          ],
+          "Resource": [
+            "arn:aws:s3:::{{storage_bucket_name}}",
+            "arn:aws:s3:::{{storage_bucket_name}}/*"
+          ]
+        },
+        {
+          "Effect": "Deny",
+          "Action": [
+            "s3:Delete*",
+            "s3:GetObject*"
+          ],
+          "Resource": [ "*" ]
+        }
+      ]
+    }
