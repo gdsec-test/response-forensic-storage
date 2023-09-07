@@ -42,6 +42,13 @@ sceptre: setup
 		echo $(MAKE) sceptre SCEPTRE_ACTION=prune SCEPTRE_ACTION_ARGS="-y" SCEPTRE_STACK="obsolete" ; \
 		echo "::endgroup::" ; \
 	fi
+	@echo "::group::Print CloudFormation template used for '$(AWS_REGION)/$(SCEPTRE_STACK)'"
+	source $(VENV_ACTIVATE) && \
+		cd sceptre && \
+			sceptre $(SCEPTRE_GLOBAL_ARGS) --var-file vars/$(AWS_ENVIRONMENT).yaml \
+				generate \
+				$(AWS_REGION)/$(SCEPTRE_STACK)
+	@echo "::endgroup::"
 	@echo "::group::Validate Sceptre stack '$(AWS_REGION)/$(SCEPTRE_STACK)'"
 	source $(VENV_ACTIVATE) && \
 		cd sceptre && \
@@ -49,13 +56,6 @@ sceptre: setup
 				$(SCEPTRE_GLOBAL_ARGS) \
 				--var-file vars/$(AWS_ENVIRONMENT).yaml \
 				validate \
-				$(AWS_REGION)/$(SCEPTRE_STACK)
-	@echo "::endgroup::"
-	@echo "::group::Print CloudFormation template used for '$(AWS_REGION)/$(SCEPTRE_STACK)'"
-	source $(VENV_ACTIVATE) && \
-		cd sceptre && \
-			sceptre $(SCEPTRE_GLOBAL_ARGS) --var-file vars/$(AWS_ENVIRONMENT).yaml \
-				generate \
 				$(AWS_REGION)/$(SCEPTRE_STACK)
 	@echo "::endgroup::"
 	@echo "::group::Print Sceptre diff for '$(AWS_REGION)/$(SCEPTRE_STACK)'"
