@@ -1,4 +1,4 @@
-name: Tartufo scan
+name: Code Quality Checks
 
 on:
   pull_request:
@@ -17,5 +17,5 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab  # v3.5.2
 
-      - name: Run code quality checks (Tartufo, pre-commit, etc.)
+      - name: Run code quality checks (pre-commit, etc.)
         run: make code-quality

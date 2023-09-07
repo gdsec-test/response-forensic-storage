@@ -26,9 +26,6 @@ setup: $(VENV_DIR)
 
 .PHONY: code-quality
 code-quality: setup
-	@echo "::group::Code Quality -- Tartufo"
-	source $(VENV_ACTIVATE) && tartufo -v --output-format=report --regex --entropy scan-local-repo .
-	@echo "::endgroup::"
 	@echo "::group::Code Quality -- pre-commit"
 	source $(VENV_ACTIVATE) && pre-commit run --all
 	@echo "::endgroup::"

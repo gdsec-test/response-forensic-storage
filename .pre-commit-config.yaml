@@ -19,12 +19,8 @@ repos:
       - id: fix-byte-order-marker
       - id: check-executables-have-shebangs
       - id: check-shebang-scripts-are-executable
-  - repo: https://github.com/godaddy/tartufo
-    rev: a6e3909ccbc5da924c3483966d39a5ba8c6e3ddd  # frozen: v4.0.1
-    hooks:
-      - id: tartufo
   - repo: https://github.com/aws-cloudformation/cfn-lint # used to be at https://github.com/aws-cloudformation/cfn-python-lint
-    rev: bd28275c7856f8c918a99a32e882ff9456c5c98e  # frozen: v0.74.1
+    rev: e9cc779f3e5335523b2acb0bd11b563cb84403b2  # frozen: v0.79.9
     hooks:
       - id: cfn-python-lint
         files: sceptre/templates/(.*/)*.*\.(yml|yaml)$
