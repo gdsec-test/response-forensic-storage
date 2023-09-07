@@ -6,5 +6,4 @@ dependencies:
 stack_name: "{{project_code}}-{{user_name}}-iam-user"
 parameters:
   UserName: "GD-user-{{user_name}}"
-  PolicyName: "CustomPolicy"
   CustomPolicySuffix: !stack_output_external "{{project_code}}-{{user_name}}-user-iam-policy::PolicyNameSuffix"

@@ -102,7 +102,7 @@ delete-all:
 # some targets to deal with the temporary IAM user
 .PHONY: temp-iam-user
 temp-iam-user:
-	$(MAKE) sceptre AWS_REGION=us-west-2 SCEPTRE_STACK=iam-user/temp
+	$(MAKE) sceptre AWS_REGION=us-west-2 SCEPTRE_STACK=iam-user/temp SCEPTRE_ACTION_ARGS="--prune -y"
 
 .PHONY: launch-temp-iam-user
 launch-temp-iam-user:

@@ -4,9 +4,6 @@ Parameters:
   UserName:
     Type: String
     Description: A name for the IAM user.
-  PolicyName:
-    Type: String
-    Description: A policy name.
   CustomPolicySuffix:
     Type: String
     Description: Suffix name of custom policy.
@@ -21,7 +18,7 @@ Resources:
         - Key: UserName
           Value: !Ref UserName
         - Key: PolicyName
-          Value: !Ref PolicyName
+          Value: "CustomPolicy"
         - Key: CustomPolicySuffix
           Value: !Ref CustomPolicySuffix
       Tags:
