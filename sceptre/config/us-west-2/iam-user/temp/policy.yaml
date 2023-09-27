@@ -4,26 +4,54 @@ template:
 stack_name: "{{project_code}}-{{user_name}}-user-iam-policy"
 parameters:
   PolicyNameSuffix: "{{user_name}}-user-iam-policy"
+  # This Policy accomplishes the following:
+  # - Allows the user to upload data to the storage bucket (collect artifacts)
+  # - Denies the user from downloading data from the storage bucket (prevent exfiltration of artifacts)
+  # - Denies the user from deleting data from all buckets (preserve data integrity)
+  # - Allows the user to perform read-only operations against all other buckets (collect artifacts)
   PolicyJSON: |
     {
       "Version": "2012-10-17",
       "Statement": [
         {
-          "Action": [
-            "s3:Get*",
-            "s3:List*",
-            "s3:AbortMultipartUpload"
-          ],
           "Effect": "Allow",
-          "Resource": "*"
+          "Action": [
+            "s3:GetBucketLocation",
+            "s3:ListBucket",
+            "s3:PutObject",
+            "s3:AbortMultipartUpload",
+            "s3:CompleteMultipartUpload",
+            "s3:CreateMultipartUpload"
+          ],
+          "Resource": [
+            "arn:aws:s3:::{{storage_bucket_name}}",
+            "arn:aws:s3:::{{storage_bucket_name}}/*"
+          ]
         },
         {
+          "Effect": "Deny",
           "Action": [
-            "s3:PutObject",
-            "s3:PutObjectAcl"
+            "s3:GetObject*"
           ],
-          "Effect": "Allow",
           "Resource": [
+            "arn:aws:s3:::{{storage_bucket_name}}",
+            "arn:aws:s3:::{{storage_bucket_name}}/*"
+          ]
+        },
+        {
+          "Effect": "Deny",
+          "Action": [
+            "s3:Delete*"
+          ],
+          "Resource": [ "*" ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:Get*",
+            "s3:List*"
+          ],
+          "NotResource": [
             "arn:aws:s3:::{{storage_bucket_name}}",
             "arn:aws:s3:::{{storage_bucket_name}}/*"
           ]
