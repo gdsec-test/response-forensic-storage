@@ -5,49 +5,34 @@ template:
 stack_name: "{{project_code}}-{{environment}}-{{region}}-s3-replication"
 parameters:
   BucketNameSuffix: "{{BucketNameSuffix}}"
-  BucketPolicy: Private
   VersioningStatus: "Enabled"
   ExpirationDays: "1461"
   OldVersionExpirationDays: "1461"
   EnableBucketMetrics: "true"
-  BucketOwnerPreferred: "true"
   MoveToStandardIAStorageDays: "180"
 sceptre_user_data:
   is_replication_target: true
   # see the comments in the eu-west-1/s3.yaml file for an explanation of why we are using a multi-line string here
   custom_bucket_policy: |
     Fn::ToJsonString:
-      Version: '2012-10-17'
-      Statement:
-        - Effect: Allow
-          Principal:
-            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-          Action: s3:*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-        - Effect: Deny
-          Principal:
-            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-          Action:
-            - s3:Delete*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-          Condition:
-            ArnEquals:
-              aws:PrincipalArn:
-                - !Ref OpsRoleARN
-                - !Ref DeployRoleARN
-        - Effect: Deny
-          Principal:
-            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-          Action:
-            - s3:Delete*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-          Condition:
-            ArnLike:
-              aws:PrincipalArn:
-                - !Sub arn:aws:iam::${AWS::AccountId}:user/*
+      - Effect: Allow
+        Principal:
+          AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+        Action: s3:*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+      - Effect: Deny
+        Principal:
+          AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+        Action:
+          - s3:Delete*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+        Condition:
+          ArnEquals:
+            aws:PrincipalArn:
+              - !Ref OpsRoleARN
+              - !Ref DeployRoleARN
+              - !Sub arn:aws:iam::${AWS::AccountId}:user/*

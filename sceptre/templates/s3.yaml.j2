@@ -24,25 +24,6 @@ Parameters:
     Default: bucket1
     AllowedPattern: "[a-z][a-z0-9-]+[a-z0-9]"
     Description: Unique naming suffix for bucket
-  BucketPolicy:
-    Type: String
-    Description: Bucket ACL to set
-    Default: Private
-    AllowedValues:
-      - Private
-      - LogDeliveryWrite
-      - AwsExecRead
-      - BucketOwnerRead
-      - BucketOwnerFullControl
-      - PublicRead
-      - AuthenticatedRead
-  BucketOwnerPreferred:
-    Type: String
-    Description: Set to true to enable ownership controls with object ownership set to BucketOwnerPreferred. Otherwise the bucket will not have ownership controls so object ownership will default to ObjectWriter.
-    Default: false
-    AllowedValues:
-      - true
-      - false
   VersioningStatus:
     Type: String
     Description: Versioning should be enabled unless there is good reason not to.
@@ -80,7 +61,7 @@ Parameters:
     Description: (optional) Name of bucket to replicate to. If replication configuration needs to be enabled, please create a bucket (with versioning enabled) in another region beforehand.
     Default: ""
   {%- endif %}
-  CustomBucketPolicyJSON:
+  CustomBucketPolicyStatements:
     Type: String
     Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
     Default: ""
@@ -107,13 +88,11 @@ Resources:
     Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
     Properties:
       ProductName: S3
-      ProvisioningArtifactName: 2.0.0
+      ProvisioningArtifactName: 3.3.0
       ProvisionedProductName: {{ provisioned_product_name }}
       ProvisioningParameters:
         - Key: BucketNameSuffix
           Value: !Ref BucketNameSuffix
-        - Key: BucketPolicy
-          Value: !Ref BucketPolicy
         - Key: VersioningStatus
           Value: !Ref VersioningStatus
         - Key: ExpirationDays
@@ -122,8 +101,6 @@ Resources:
           Value: !Ref OldVersionExpirationDays
         - Key: EnableBucketMetrics
           Value: !Ref EnableBucketMetrics
-        - Key: BucketOwnerPreferred
-          Value: !Ref BucketOwnerPreferred
         - Key: MoveToStandardIAStorageDays
           Value: !Ref MoveToStandardIAStorageDays
         {% if not is_replication_target -%}
@@ -134,11 +111,11 @@ Resources:
                 - name: !Ref ReplicationBucket
               - !Ref ReplicationBucketsJSON
         {%- endif %}
-        - Key: CustomBucketPolicyJSON
+        - Key: CustomBucketPolicyStatements
           Value:
             {% if sceptre_user_data.custom_bucket_policy is defined -%}
             {{- sceptre_user_data.custom_bucket_policy | indent(12) }}
-            {%- else -%} !Ref CustomBucketPolicyJSON {%- endif %}
+            {%- else -%} !Ref CustomBucketPolicyStatements {%- endif %}
       Tags:
         - Key: doNotShutDown
           Value: true

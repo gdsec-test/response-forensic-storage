@@ -7,12 +7,10 @@ dependencies:
   - eu-west-2/s3-replication.yaml
 parameters:
   BucketNameSuffix: "{{BucketNameSuffix}}"
-  BucketPolicy: Private
   VersioningStatus: "Enabled"
   ExpirationDays: "1461"
   OldVersionExpirationDays: "1461"
   EnableBucketMetrics: "true"
-  BucketOwnerPreferred: "true"
   MoveToStandardIAStorageDays: "180"
   ReplicationBucket: !stack_output_external "{{project_code}}-{{environment}}-eu-west-2-s3-replication::BucketName"
 sceptre_user_data:
@@ -25,98 +23,127 @@ sceptre_user_data:
   # - we do not run up against the 4096 character limit of the CustomBucketPolicy parameter (largely due to indentation)
   custom_bucket_policy: |
     Fn::ToJsonString:
-      Version: '2012-10-17'
-      Statement:
-        - Effect: Allow
-          Principal:
-            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-          Action: s3:*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-        - Effect: Deny
-          Principal:
-            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-          Action:
-            - s3:Delete*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-          Condition:
-            ArnEquals:
-              aws:PrincipalArn:
-                - !Ref OpsRoleARN
-                - !Ref DeployRoleARN
-        - Effect: Deny
-          Principal:
-            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-          Action:
-            - s3:Delete*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-          Condition:
-            ArnLike:
-              aws:PrincipalArn:
-                - !Sub arn:aws:iam::${AWS::AccountId}:user/GD-user-*
-        - Effect: Allow
-          Principal:
-            Service: ssm.amazonaws.com
-          Action:
-            - s3:Get*
-            - s3:List*
-            - s3:PutObject*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/ssmLogs
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/ssmLogs/*
-          Condition:
-            StringEquals:
-              aws:SourceAccount: {{ analysis_account_id }}
-        - Effect: Allow
-          Principal:
-            AWS: arn:aws:iam::{{ analysis_account_id }}:root
-          Action:
-            - s3:ListBucket
-            - s3:GetObject*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-          Condition:
-            StringEquals:
-              aws:PrincipalTag/IncidentResponse: ForensicAnalysis
-        - Effect: Allow
-          Principal:
-            AWS: arn:aws:iam::{{ analysis_account_id }}:root
-          Action:
-            - s3:PutObject
-            - s3:DeleteObject
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_analysis/*
-          Condition:
-            StringEquals:
-              aws:PrincipalTag/IncidentResponse: ForensicAnalysis
-        - Effect: Allow
-          Principal:
-            AWS: arn:aws:iam::{{ analysis_account_id }}:root
-          Action:
-            - s3:ListBucket
-            - s3:GetObject*
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
-          Condition:
-            ArnEquals:
-              aws:PrincipalArn:
-                - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops
-        - Effect: Allow
-          Principal:
-            AWS: arn:aws:iam::{{ analysis_account_id }}:root
-          Action:
-            - s3:PutObject
-            - s3:DeleteObject
-          Resource:
-            - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_analysis/*
-          Condition:
-            ArnEquals:
-              aws:PrincipalArn:
-                - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops
+      - Effect: Allow
+        Principal:
+          AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+        Action: s3:*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+      - Effect: Deny
+        Principal:
+          AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+        Action:
+          - s3:Delete*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+        Condition:
+          ArnEquals:
+            aws:PrincipalArn:
+              - !Ref OpsRoleARN
+              - !Ref DeployRoleARN
+      - Effect: Deny
+        Principal:
+          AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+        Action:
+          - s3:Delete*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+        Condition:
+          ArnLike:
+            aws:PrincipalArn:
+              - !Sub arn:aws:iam::${AWS::AccountId}:user/GD-user-*
+      # This rule is required to allow SSM to write logs to this bucket
+      # I am not sure what Service/Condition combination to use here, so I'm using the account principal instead; definitely not ideal
+      # I have already tried:
+      #   - s3.amazonaws.com
+      #   - ssm.amazonaws.com
+      # Along with the Condition of StringEquals with aws:SourceAccount
+      - Effect: Allow
+        Principal:
+          # Service: ssm.amazonaws.com
+          AWS: arn:aws:iam::{{ analysis_account_id }}:root
+        # Condition:
+        #   StringEquals:
+        #     aws:SourceAccount: {{ analysis_account_id }}
+        Action:
+          - s3:GetEncryptionConfiguration
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+      - Effect: Allow
+        Principal:
+          Service: ssm.amazonaws.com
+        Action:
+          - s3:Get*
+          - s3:List*
+          - s3:PutObject*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/ssmLogs
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/ssmLogs/*
+        Condition:
+          StringEquals:
+            aws:SourceAccount: {{ analysis_account_id }}
+      - Effect: Allow
+        Principal:
+          AWS: arn:aws:iam::{{ analysis_account_id }}:root
+        Action:
+          - s3:List*
+          - s3:GetObject*
+          - s3:GetBucket*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+        Condition:
+          StringEquals:
+            aws:PrincipalTag/IncidentResponse: ForensicAnalysis
+      - Effect: Allow
+        Principal:
+          AWS: arn:aws:iam::{{ analysis_account_id }}:root
+        Action:
+          - s3:PutObject
+          - s3:DeleteObject
+          - s3:*MultipartUpload*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_analysis/*
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_plaso/*
+        Condition:
+          StringEquals:
+            aws:PrincipalTag/IncidentResponse: ForensicAnalysis
+      - Effect: Allow
+        Principal:
+          AWS: arn:aws:iam::{{ analysis_account_id }}:root
+        Action:
+          - s3:List*
+          - s3:GetObject*
+          - s3:GetBucket*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*
+        Condition:
+          ArnEquals:
+            aws:PrincipalArn:
+              - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops
+              {% if environment == "dev-private" -%}
+              - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Dev-Private-PowerUser
+              - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Dev-Private-MgrAdmin
+              {%- endif %}
+      - Effect: Allow
+        Principal:
+          AWS: arn:aws:iam::{{ analysis_account_id }}:root
+        Action:
+          - s3:PutObject
+          - s3:DeleteObject
+          - s3:*MultipartUpload*
+        Resource:
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_analysis/*
+          - !Sub arn:aws:s3:::gd-${DevelopmentTeam}-${Environment}-${BucketNameSuffix}/*/_plaso/*
+        Condition:
+          ArnEquals:
+            aws:PrincipalArn:
+              - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Ops
+              {% if environment == "dev-private" -%}
+              - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Dev-Private-PowerUser
+              - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Dev-Private-MgrAdmin
+              {%- endif %}
