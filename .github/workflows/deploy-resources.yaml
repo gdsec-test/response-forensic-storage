@@ -36,7 +36,10 @@ env:
 
 jobs:
   deploy:
-    runs-on: [self-hosted,incident-response,response-forensic-storage,deploy]
+    runs-on:
+      group: 6726-storageaccount
+      labels:
+        - self-hosted
     environment: "${{ inputs.aws_environment }}"
     steps:
       - name: Checks for running in production

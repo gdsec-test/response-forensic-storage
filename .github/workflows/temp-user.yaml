@@ -44,7 +44,10 @@ env:
 jobs:
   sceptre_action:
     environment: "${{ inputs.aws_environment }}"
-    runs-on: [self-hosted,incident-response,response-forensic-storage,deploy]
+    runs-on:
+      group: 6726-storageaccount
+      labels:
+        - self-hosted
 
     steps:
       - name: Check u_accept for running in prod
