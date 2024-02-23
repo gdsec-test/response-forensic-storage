@@ -9,7 +9,7 @@ env_require = @( [[ -v '$(1)' ]] && [[ -n "$${$(1)}" ]] ) \
 	&& { printf "export $(1)=$${$(1)}\n" > /dev/stderr; } \
 	|| { printf '::error:: [FATAL] Required environment variable "$(1)" is not set\n' > /dev/stderr; exit 1; }
 
-$(VENV_DIR): Makefile $(REQUIREMENTS_FILE) .pre-commit-config.yaml
+$(VENV_ACTIVATE): Makefile $(REQUIREMENTS_FILE) .pre-commit-config.yaml
 	@echo "::group::Set up Python virtual environment in $(VENV_DIR)"
 	$(PYTHON) -m venv $(VENV_DIR)
 	source $(VENV_ACTIVATE) && \
@@ -22,7 +22,7 @@ $(VENV_DIR): Makefile $(REQUIREMENTS_FILE) .pre-commit-config.yaml
 	@echo "::endgroup::"
 
 .PHONY: setup
-setup: $(VENV_DIR)
+setup: $(VENV_ACTIVATE)
 
 .PHONY: code-quality
 code-quality: setup
@@ -37,9 +37,13 @@ sceptre: setup
 	$(call env_require,AWS_ENVIRONMENT)
 	$(call env_require,SCEPTRE_ACTION)
 	$(call env_require,SCEPTRE_STACK)
-	@if [[ -d sceptre/$(AWS_REGION)/obsolete ]] ; then \
+	@# Best effort to remove obsolete resources; ignore errors
+	@if [[ -d sceptre/config/$(AWS_REGION)/obsolete ]] ; then \
 		echo "::group::Removing obsolete resources in region $(AWS_REGION)" ; \
-		echo $(MAKE) sceptre SCEPTRE_ACTION=prune SCEPTRE_ACTION_ARGS="-y" SCEPTRE_STACK="obsolete" ; \
+		source $(VENV_ACTIVATE) && \
+			cd sceptre && \
+			sceptre $(SCEPTRE_GLOBAL_ARGS) --var-file vars/$(AWS_ENVIRONMENT).yaml \
+				prune -y "$(AWS_REGION)/obsolete" || true ; \
 		echo "::endgroup::" ; \
 	fi
 	@echo "::group::Print CloudFormation template used for '$(AWS_REGION)/$(SCEPTRE_STACK)'"
