@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::LanguageExtensions
+Description: Deploy SNS Topic
+Parameters:
+  TopicName:
+    Type: String
+    Description: Name of the SNS Topic
+  {% if not sceptre_user_data.policy_document is defined %}
+  PolicyDocument:
+    Type: String
+    Description: The resource policy for the SNS Topic
+  {% else %}
+  # The policy document is provided through sceptre_user_data
+  {% endif %}
+  TeamName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: The name of the team that owns this topic
+    Default: /AdminParams/Team/Name
+    AllowedValues: [/AdminParams/Team/Name]
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: The name of the current AWS environment
+    Default: /AdminParams/Team/Environment
+    AllowedValues: [/AdminParams/Team/Environment]
+  AnalysisAccountId:
+    Type: Number
+    Description: The Account ID of the Analysis account in the current AWS Organization
+
+Resources:
+  SNSTopic:
+    Type: AWS::ServiceCatalog::CloudFormationProvisionedProduct
+    Properties:
+      ProductName: SNS
+      ProvisioningArtifactName: 1.2.2
+      ProvisionedProductName: !Sub ${TeamName}-${TopicName}-SNS
+      ProvisioningParameters:
+        - Key: PolicyDocument
+          Value:
+            {% if sceptre_user_data.policy_document is defined -%}
+            {{ sceptre_user_data.policy_document | indent(12) }}
+            {%- else -%} !Ref PolicyDocument {%- endif %}
+        - Key: SnsTopicName
+          Value: !Sub ${TeamName}-${TopicName}-SNS
+        - Key: FifoTopic
+          Value: ""
+      Tags:
+        - Key: doNotShutDown
+          Value: "true"
+
+Outputs:
+  SnsTopicArn:
+    Description: The ARN of the SNS Topic
+    Value: !GetAtt SNSTopic.Outputs.SnsTopicArn

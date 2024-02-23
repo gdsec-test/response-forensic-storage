@@ -1,0 +1,42 @@
+template:
+  type: file
+  path: sns.yaml.j2
+stack_name: "{{project_code}}-{{BucketNameSuffix}}-sns"
+parameters:
+  TopicName: ForensicStorageBucketWriteNotifications
+  AnalysisAccountId: "{{ var.analysis_account_id }}"
+sceptre_user_data:
+  policy_document: |
+    Fn::ToJsonString:
+      Id: SNSTopicPolicy
+      Version: '2012-10-17'
+      Statement:
+        - Sid: AllowLocalAndAnalysisAccountServiceCatalogToCreateSNSTopicSubscriptions
+          Action:
+            - sns:Subscribe
+            - sns:ListSubscriptionsByTopic
+            - sns:GetTopicAttributes
+          Effect: Allow
+          Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${TeamName}-${TopicName}-SNS
+          Condition:
+            ArnEquals:
+              aws:PrincipalArn:
+                - !Sub arn:aws:iam::${AWS::AccountId}:role/ServiceCatalogLaunchConstraintRole
+                - !Sub arn:aws:iam::${AnalysisAccountId}:role/ServiceCatalogLaunchConstraintRole
+          Principal:
+            AWS:
+              - !Ref AWS::AccountId
+              - !Ref AnalysisAccountId
+        - Sid: OnlyAllowForensicStorageBucketWriteNotifications
+          Effect: Allow
+          Principal:
+            Service: s3.amazonaws.com
+          Action: sns:Publish
+          Resource: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${TeamName}-${TopicName}-SNS
+          Condition:
+            StringEquals:
+              aws:SourceAccount: !Ref AWS::AccountId
+            ArnEquals:
+              aws:SourceArn:
+                - !Sub arn:aws:s3:::gd-${TeamName}-${Environment}-forensic-storage
+                - !Sub arn:aws:s3:::gd-${TeamName}-${Environment}-forensic-storage/*

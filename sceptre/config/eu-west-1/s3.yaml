@@ -4,6 +4,7 @@ template:
 # we need to manage a stack created in the past because we must preserve existing S3 buckets
 stack_name: "{{project_code}}-{{environment}}-{{region}}-s3"
 dependencies:
+  - eu-west-1/sns.yaml
   - eu-west-2/s3-replication.yaml
 parameters:
   BucketNameSuffix: "{{BucketNameSuffix}}"
@@ -13,6 +14,7 @@ parameters:
   EnableBucketMetrics: "true"
   MoveToStandardIAStorageDays: "180"
   ReplicationBucket: !stack_output_external "{{project_code}}-{{environment}}-eu-west-2-s3-replication::BucketName"
+  NotificationTopicARN: !stack_output_external "{{project_code}}-{{BucketNameSuffix}}-sns::SnsTopicArn"
 sceptre_user_data:
   # to use your IDE's YAML formatter/linter, just comment out the pipe character in the following line
   # please be sure to restore it before committing your changes
@@ -147,3 +149,12 @@ sceptre_user_data:
               - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Dev-Private-PowerUser
               - arn:aws:iam::{{ analysis_account_id }}:role/GD-AWS-USA-GD-RespForens-Dev-Private-MgrAdmin
               {%- endif %}
+  extra_parameters: |
+    NotificationTopicARN:
+      Description: ARN for the SNS Topic
+      Type: String
+  notification_configuration: |
+    Fn::ToJsonString:
+      TopicConfigurations:
+        - Event: s3:ObjectCreated:*
+          Topic: !Ref NotificationTopicARN

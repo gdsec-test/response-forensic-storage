@@ -65,6 +65,10 @@ Parameters:
     Type: String
     Description: Custom JSON S3 Bucket Policy. This will be ignored if DataLakeBucket is true.
     Default: ""
+  NotificationConfigurationJson:
+    Type: String
+    Description: (optional) JSON definition of S3 Notification Configuration https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfig.html
+    Default: ""
   DevelopmentTeam:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /AdminParams/Team/Name
@@ -77,6 +81,13 @@ Parameters:
   DeployRoleARN:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /AdminParams/IAM/DeployRoleArn
+  {% if sceptre_user_data.extra_parameters is defined %}
+  # All parameters below this point are not standard, and have been added through sceptre_user_data.extra_parameters
+  # This is meant as a way to add additional parameters to the stack without having to modify the template
+  # However, this is not best practice, and should be avoided if possible
+  # The intended use case is for adding specific ARNs for Resource blocks in policies or similar
+  {{ sceptre_user_data.extra_parameters | indent(2) }}
+  {% endif %}
 
 {% if not is_replication_target -%}
 Conditions:
@@ -116,6 +127,11 @@ Resources:
             {% if sceptre_user_data.custom_bucket_policy is defined -%}
             {{- sceptre_user_data.custom_bucket_policy | indent(12) }}
             {%- else -%} !Ref CustomBucketPolicyStatements {%- endif %}
+        - Key: NotificationConfigurationJson
+          Value:
+            {% if sceptre_user_data.notification_configuration is defined -%}
+            {{- sceptre_user_data.notification_configuration | indent(12) }}
+            {%- else -%} !Ref NotificationConfigurationJson {%- endif %}
       Tags:
         - Key: doNotShutDown
           Value: true
