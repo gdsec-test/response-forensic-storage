@@ -1,14 +1,10 @@
 name: Deploy PROD
 
-# Deploys the ResponseStorage resources to the AWS DEV environment using sceptre.
+# Deploys the ResponseStorage resources to the AWS PROD environment using sceptre.
 # This workflow runs on a self-hosted runner
 
 # Can only be deployed manually through workflow_dispatch - Select your branch while running.
 
-#on:
-# push:
-#  branches:
-#    - "main"
 on:
   workflow_dispatch:
     inputs:
