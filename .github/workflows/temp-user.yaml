@@ -65,7 +65,7 @@ jobs:
 
       # This logs us in to the ${{ inputs.aws_environment }} account's deploy role
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
